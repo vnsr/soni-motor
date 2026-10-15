@@ -164,6 +164,11 @@ svg.bars .g{stroke:var(--line)}
 .warn b{display:block;margin-bottom:2px}
 .warn ul{margin:4px 0 0;padding-left:18px}
 .ver{color:var(--muted);font-size:12.5px;text-align:center}
+.qtab{overflow-x:auto}
+.qtab table{width:100%;border-collapse:collapse;font-size:14px;font-variant-numeric:tabular-nums}
+.qtab th,.qtab td{padding:8px 6px;text-align:right;border-top:1px solid var(--line);white-space:nowrap}
+.qtab th{border-top:0;color:var(--muted);font-weight:600;font-size:12.5px}
+.qtab th:first-child,.qtab td:first-child{text-align:left}
 /* v1.3: timetable */
 .ttbar{display:flex;align-items:center;gap:8px}
 .ttdate{flex:1;position:relative;display:flex;justify-content:center;text-align:center;border:1px solid var(--line);border-radius:var(--r);background:var(--surface);padding:6px 10px;cursor:pointer}
@@ -281,6 +286,8 @@ const I18N = {
     printDay: 'Print day', printWeek: 'Print week', printHint: 'In the print screen, choose "Save as PDF" to get a file.',
     noCars: 'No cars yet. Add them in the Packages tab of the sheet.', slotsSummary: (b, k, f) => `${b} booked · ${k} blocked · ${f} free`,
     taken: 'Someone just changed one of these slots. The timetable is refreshed; please check and try again.',
+    quizT: 'Practice quiz (anonymous)', quizCols: ['Week', 'People', 'Tests', 'Ready', 'Book', 'Shared'], quizSources: 'Where visitors came from, last 4 weeks', quizNone: 'No quiz visits yet.',
+    srcName: { share: 'Shared by someone', flyer: 'Flyer QR code', gbp: 'Google profile', app: 'Installed app', direct: 'Direct link', card: 'Review card' },
     bookedBy: 'Booked by', todayBookings: "Today's timetable", nextBooking: 'Next lesson', time: 'Time', tick: 'Done', printedOn: 'Printed',
     remindMsg: (n, d, tm, car) => `Hello ${n}, a reminder from Soni Motor Training School: your driving lesson is on ${d} at ${tm} (${car}). See you then!`,
     skill: {
@@ -338,6 +345,8 @@ const I18N = {
     printDay: 'દિવસ છાપો', printWeek: 'અઠવાડિયું છાપો', printHint: 'ફાઇલ જોઈતી હોય તો પ્રિન્ટ સ્ક્રીનમાં "Save as PDF" પસંદ કરો.',
     noCars: 'હજી ગાડીઓ નથી. શીટના Packages ટૅબમાં ઉમેરો.', slotsSummary: (b, k, f) => `${b} બુક · ${k} બંધ · ${f} ખાલી`,
     taken: 'આમાંનો કોઈ સ્લૉટ હમણાં બીજા કોઈએ બદલ્યો. સમયપત્રક તાજું કર્યું; જોઈને ફરી પ્રયત્ન કરો.',
+    quizT: 'પ્રેક્ટિસ ક્વિઝ (નામ વગર)', quizCols: ['અઠવાડિયું', 'લોકો', 'ટેસ્ટ', 'તૈયાર', 'બુક ટૅપ', 'શેર'], quizSources: 'મુલાકાતીઓ ક્યાંથી આવ્યા, છેલ્લા 4 અઠવાડિયા', quizNone: 'હજી ક્વિઝની કોઈ મુલાકાત નથી.',
+    srcName: { share: 'કોઈએ શેર કર્યું', flyer: 'ફ્લાયરનો QR કોડ', gbp: 'ગૂગલ પ્રોફાઇલ', app: 'ઇન્સ્ટૉલ કરેલી ઍપ', direct: 'સીધી લિંક', card: 'રિવ્યૂ કાર્ડ' },
     bookedBy: 'બુક કરનાર', todayBookings: 'આજનું સમયપત્રક', nextBooking: 'આગળનો લેસન', time: 'સમય', tick: 'થયું', printedOn: 'છાપ્યું',
     remindMsg: (n, d, tm, car) => `નમસ્તે ${n}, સોની મોટર ટ્રેનિંગ સ્કૂલ તરફથી યાદ અપાવીએ છીએ: તમારો ડ્રાઇવિંગ લેસન ${d}ના રોજ ${tm} વાગ્યે છે (${car}). મળીએ!`,
     skill: {
@@ -352,7 +361,7 @@ const SOURCES = ['Walk-in', 'Phone', 'WhatsApp', 'Google', 'Referral', 'Other'];
 const MODES = ['Cash', 'UPI', 'Card'];
 const LICS = ['None', 'Learner', 'Permanent'];
 const SKILLS = ['controls', 'moveoff', 'clutch', 'steering', 'turns', 'signals', 'traffic', 'reverse', 'parking', 'slope', 'rto'];
-const APP_VERSION = '1.3.1';
+const APP_VERSION = '1.4.0';
 
 /* ================= storage ================= */
 const ls = {
@@ -853,7 +862,12 @@ function renderReport(m) {
       <dt>${t.outstanding}</dt><dd>${inr(owed)}</dd>
       <dt>${t.reviews}</dt><dd>${t.reviewsTxt(n2(asked), n2(got))}</dd></dl></div>
     <section><h2>${t.lessons8}</h2><div class="card" style="padding:10px"><svg class="bars" viewBox="0 0 ${W} ${H}" role="img" aria-label="${t.lessons8}">${bars}</svg></div></section>
-    <section><h2>${t.sources8}</h2><div class="card">${src.map(([k, v]) => `<div class="row"><div class="main"><div class="t">${t.src[k]}</div><div class="prog"><i style="width:${v / smx * 100}%"></i></div></div><b>${n2(v)}</b></div>`).join('') || `<div class="empty">${t.none}</div>`}</div></section>`;
+    <section><h2>${t.sources8}</h2><div class="card">${src.map(([k, v]) => `<div class="row"><div class="main"><div class="t">${t.src[k]}</div><div class="prog"><i style="width:${v / smx * 100}%"></i></div></div><b>${n2(v)}</b></div>`).join('') || `<div class="empty">${t.none}</div>`}</div></section>
+    ${(() => { const Q = st.db.quiz; if (!Q) return `<section><h2>${t.quizT}</h2><div class="card"><div class="empty">${t.quizNone}</div></div></section>`;
+      const W = Q.weeks.slice().reverse().slice(0, 6), S = Object.entries(Q.sources || {}).sort((a, b) => b[1] - a[1]), smx = Math.max(1, ...S.map(x => x[1]));
+      return `<section><h2>${t.quizT}</h2><div class="card qtab"><table><thead><tr>${t.quizCols.map(c => `<th>${c}</th>`).join('')}</tr></thead><tbody>
+        ${W.map(w => `<tr><td>${fd(w.week)}</td><td>${n2(w.people)}</td><td>${n2(w.tests)}</td><td>${n2(w.ready)}</td><td>${n2(w.book)}</td><td>${n2(w.share)}</td></tr>`).join('')}</tbody></table></div></section>
+        ${S.length ? `<section><h2>${t.quizSources}</h2><div class="card">${S.map(([k, v]) => `<div class="row"><div class="main"><div class="t">${esc(t.srcName[k] || k)}</div><div class="prog"><i style="width:${v / smx * 100}%"></i></div></div><b>${n2(v)}</b></div>`).join('')}</div></section>` : ''}`; })()}`;
 }
 
 /* ================= timetable ================= */
@@ -1108,6 +1122,8 @@ const Mock = (() => {
    [1, 'Maruti Swift', '06:30', 'S6'], [1, 'Hyundai i20', '09:00', 'S6']]
     .forEach(([dd, car, sl, sid]) => db.bookings.push({ ID: rid('B'), Date: addDays(td, dd), Car: car, Slot: sl, Type: 'Booked', StudentID: sid, Note: '', LoggedBy: 'Office' }));
   [0, 1].forEach(dd => ['13:00', '13:30'].forEach(sl => db.bookings.push({ ID: rid('B'), Date: addDays(td, dd), Car: 'Maruti Swift', Slot: sl, Type: 'Blocked', StudentID: '', Note: 'Lunch', LoggedBy: 'Trainer' })));
+  db.quiz = { weeks: Array.from({ length: 8 }, (_, i) => ({ week: addDays(weekStart(td), -7 * (7 - i)), people: [3, 5, 4, 9, 12, 15, 21, 18][i], tests: [4, 7, 6, 14, 19, 25, 33, 27][i], ready: [0, 1, 1, 2, 3, 4, 6, 5][i], book: [0, 0, 1, 1, 2, 2, 4, 3][i], share: [0, 1, 0, 2, 3, 3, 5, 4][i] })),
+    sources: { share: 21, flyer: 14, gbp: 6, direct: 9, app: 4 } };
   const PINS = { '1993': 'Trainer', '2024': 'Office' };
   const copy = () => JSON.parse(JSON.stringify(db));
   function api(pin, action, p) {

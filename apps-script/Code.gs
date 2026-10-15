@@ -17,7 +17,7 @@
  *   The /exec URL stays the same, so the app needs no change.
  */
 
-const VERSION = '1.3.0';
+const VERSION = '1.4.0';
 const MAX_FAILS = 8, LOCK_SECONDS = 15 * 60;   // wrong-PIN protection
 
 const TABS = {
@@ -30,7 +30,8 @@ const TABS = {
   Payments: ['ID', 'Date', 'StudentID', 'AmountINR', 'Mode', 'LoggedBy', 'Timestamp'],
   Skills: ['StudentID', 'Skill', 'Date', 'LoggedBy', 'Timestamp'],
   Bookings: ['ID', 'Date', 'Car', 'Slot', 'Type', 'StudentID', 'Note', 'LoggedBy', 'Timestamp'],
-  Activity: ['Timestamp', 'Name', 'Action', 'Ref']
+  Activity: ['Timestamp', 'Name', 'Action', 'Ref'],
+  QuizStats: ['Timestamp', 'Device', 'Event', 'Score', 'Total', 'Lang', 'Ready', 'Source']
 };
 
 /* columns kept as plain text so Sheets does not turn them into numbers or dates */
@@ -54,8 +55,15 @@ const DEFAULT_SETTINGS = [
 ];
 
 /* ================= web app (JSON API) ================= */
-/** Health check: opening the /exec URL in a browser shows this. */
-function doGet() {
+/**
+ * Health check: opening the /exec URL in a browser shows this.
+ * ?public=1 gives the public practice quiz the school's name and WhatsApp number (nothing else).
+ */
+function doGet(e) {
+  if (e && e.parameter && e.parameter.public === '1') {
+    const s = readSettings_(SpreadsheetApp.getActive());
+    return json_({ ok: true, school: s.SchoolName || '', phone: phone_(s.SchoolPhone) });
+  }
   return json_({ ok: true, app: 'soni-motor', version: VERSION });
 }
 
@@ -68,6 +76,7 @@ function doPost(e) {
   let req;
   try { req = JSON.parse((e && e.postData && e.postData.contents) || '{}'); } catch (x) { return json_({ ok: false, error: 'Bad request' }); }
   const cache = CacheService.getScriptCache();
+  if (req.action === 'quizStat') return json_(quizStat_(req.payload || {}, cache));   // public, anonymous, no PIN
   const fails = Number(cache.get('pinFails') || 0);
   if (fails >= MAX_FAILS) return json_({ ok: false, error: 'LOCKED' });
   try {
@@ -79,6 +88,45 @@ function doPost(e) {
     if (m === 'PIN') { cache.put('pinFails', String(fails + 1), LOCK_SECONDS); return json_({ ok: false, error: 'PIN' }); }
     return json_({ ok: false, error: m });
   }
+}
+
+/**
+ * Anonymous counts from the public practice quiz. No names or numbers: only a random device code
+ * made on the student's phone, the event, the score, the language and where the link came from.
+ * Throttled so a single phone (or a script) cannot flood the sheet.
+ */
+function quizStat_(p, cache) {
+  const device = String(p.Device || ''), event = String(p.Event || '');
+  if (!/^[a-z0-9]{6,20}$/.test(device) || ['open', 'test', 'book', 'share'].indexOf(event) < 0) return { ok: false, error: 'Bad stat' };
+  const day = today_(), kAll = 'qall:' + day, kDev = 'qd:' + day + ':' + device;
+  const all = Number(cache.get(kAll) || 0), mine = Number(cache.get(kDev) || 0);
+  if (all >= 3000 || mine >= 40) return { ok: true, skipped: true };
+  if (event === 'open') { const kOpen = 'qo:' + day + ':' + device; if (cache.get(kOpen)) return { ok: true, skipped: true }; cache.put(kOpen, '1', 21600); }
+  cache.put(kAll, String(all + 1), 21600); cache.put(kDev, String(mine + 1), 21600);
+  const n = function (x, max) { x = Math.round(num_(x)); return x >= 0 && x <= max ? x : ''; };
+  const lock = LockService.getScriptLock(); lock.waitLock(20000);
+  try {
+    append_(SpreadsheetApp.getActive(), 'QuizStats', { Timestamp: new Date().toISOString(), Device: device, Event: event,
+      Score: event === 'test' ? n(p.Score, 50) : '', Total: event === 'test' ? n(p.Total, 50) : '',
+      Lang: p.Lang === 'en' ? 'en' : 'gu', Ready: p.Ready === 'yes' ? 'yes' : (event === 'test' ? 'no' : ''),
+      Source: String(p.Source || '').toLowerCase().replace(/[^a-z0-9_-]/g, '').slice(0, 20) });
+  } finally { lock.releaseLock(); }
+  return { ok: true };
+}
+
+/** Weekly quiz numbers for the app's Report: last 8 weeks, plus where people came from in the last 4. */
+function quizSummary_(ss) {
+  const rows = rows_(ss, 'QuizStats'); if (!rows.length) return null;
+  const monday = function (iso) { const d = new Date(String(iso).slice(0, 10) + 'T00:00:00Z'); d.setUTCDate(d.getUTCDate() - (d.getUTCDay() + 6) % 7); return d.toISOString().slice(0, 10); };
+  const w0 = monday(today_()), weeks = {}, src = {};
+  for (let i = 0; i < 8; i++) weeks[addDays_(w0, -7 * i)] = { devices: {}, opens: 0, tests: 0, ready: 0, book: 0, share: 0 };
+  const from4 = addDays_(w0, -21);
+  rows.forEach(function (r) {
+    const day = String(r.Timestamp).slice(0, 10), w = weeks[monday(day)];
+    if (w) { w.devices[r.Device] = 1; if (r.Event === 'open') w.opens++; if (r.Event === 'test') { w.tests++; if (r.Ready === 'yes') w.ready++; } if (r.Event === 'book') w.book++; if (r.Event === 'share') w.share++; }
+    if (r.Event === 'open' && day >= from4) { const k = r.Source || 'direct'; src[k] = (src[k] || 0) + 1; }
+  });
+  return { weeks: Object.keys(weeks).sort().map(function (k) { const w = weeks[k]; return { week: k, people: Object.keys(w.devices).length, tests: w.tests, ready: w.ready, book: w.book, share: w.share }; }), sources: src };
 }
 
 function json_(o) {
@@ -231,7 +279,8 @@ function loadDb_(ss, settings) {
     skills: rows_(ss, 'Skills'),
     /* timetable: last 14 days to 90 days ahead keeps the phone's copy small */
     bookings: (function () { const from = addDays_(today_(), -14), to = addDays_(today_(), 90);
-      return rows_(ss, 'Bookings').filter(function (b) { return b.Date >= from && b.Date <= to; }); })()
+      return rows_(ss, 'Bookings').filter(function (b) { return b.Date >= from && b.Date <= to; }); })(),
+    quiz: quizSummary_(ss)
   };
 }
 

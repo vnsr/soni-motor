@@ -1,4 +1,4 @@
-# Soni Motor app v1.3 — connect the Google Sheet and go live
+# Soni Motor app v1.4 — connect the Google Sheet and go live
 
 For the app admin. About 30 minutes remotely, plus 10 minutes on each phone at the school.
 
@@ -25,13 +25,13 @@ vnsr.github.io/soni-motor                                 (bound to the Sheet)  
 5. Google asks for permission. For your own script it shows *"Google hasn't verified this app"*: **Advanced → Go to (project name) (unsafe) → Allow**. It only gets access to this one Sheet.
 6. Open **Execution log** at the bottom. It shows each person's new **PIN** and a *Still to do* list. The PINs are also in the Staff tab.
 
-`setup` creates the tabs Settings, Staff, Packages, Enquiries, Students, Lessons, Payments, Skills, Bookings and Activity, and gives every person in Staff a PIN. It removes an empty default tab (Sheet1 / Tabellenblatt1) and never deletes data, so you can run it again at any time.
+`setup` creates the tabs Settings, Staff, Packages, Enquiries, Students, Lessons, Payments, Skills, Bookings, Activity and QuizStats, and gives every person in Staff a PIN. It removes an empty default tab (Sheet1 / Tabellenblatt1) and never deletes data, so you can run it again at any time.
 
 ## 2. Fill in the Sheet (10 min)
 
 | Tab | What to enter |
 |---|---|
-| **Settings** | `SchoolPhone` (10 digits). `ReviewLink` is already filled with `g.page/r/CWKtBfMYEdoAEBM/review`. Check the `PIN`. The WhatsApp message texts can be edited here. |
+| **Settings** | `SchoolPhone` (10 digits). The practice quiz shows its *Book lessons* button only once this is filled. `ReviewLink` is already filled with `g.page/r/CWKtBfMYEdoAEBM/review`. Check the `PIN`. The WhatsApp message texts can be edited here. |
 | **Staff** | One row per person: `Name` as it should appear in the app, `PIN` (4–8 digits, different for each person; run `setup` and it fills in random ones), `Active` Yes/No. Set **No** when someone leaves: their PIN stops working at once. |
 | **Packages** | One row per car: `PackageID` P1, P2 … · `Car` · `Transmission` Manual or Automatic · `Lessons` · `MinutesPerLesson` · `PriceINR` · `Active` Yes/No. |
 
@@ -44,7 +44,7 @@ Back in Apps Script, run **`checkSetup`** until the log says **Setup complete**.
 1. **Deploy → New deployment → ⚙ Select type → Web app.**
 2. Description: `Soni Motor API`. Execute as: **Me**. Who has access: **Anyone**.
 3. **Deploy**, then copy the **Web app URL**. It ends in `/exec`.
-4. Check it: open the URL in a browser. You should see `{"ok":true,"app":"soni-motor","version":"1.2"}`.
+4. Check it: open the URL in a browser. You should see `{"ok":true,"app":"soni-motor","version":"1.4.0"}`.
 
 "Anyone" is needed because the phones aren't signed in to Google. The PIN is what protects the data.
 
@@ -64,6 +64,21 @@ Commit. GitHub Pages republishes in about a minute. To see the demo with made-up
 
 **GitHub Pages (once):** repo **Settings → Pages → Source: Deploy from a branch → `main` / root → Save.** The app is then at <https://vnsr.github.io/soni-motor/> and the quiz at <https://vnsr.github.io/soni-motor/quiz/>.
 
+## Practice quiz and anonymous counts
+
+The public practice at <https://vnsr.github.io/soni-motor/quiz/> needs no PIN. It sends the Sheet only anonymous events, which land in the **QuizStats** tab: a random device code, the event (`open`, `test`, `book`, `share`), the test score, language, whether the person counts as ready, and where they came from. No names, phone numbers or answers. The app's Report tab sums them per week.
+
+Where people came from is read from `?src=` in the link. Use one per channel so the Report shows what works:
+
+| Link | Use it on |
+|---|---|
+| `…/quiz/?src=flyer` | Printed flyer / QR at the office |
+| `…/quiz/?src=gbp` | Google Business Profile posts |
+| `…/quiz/?src=card` | Review card and WhatsApp messages to students |
+| `…/quiz/?src=share` | Added automatically when someone shares their result |
+
+Limits built in: at most 40 events per phone and 3,000 per day, and one *open* per phone per day, so a spammer can't fill the Sheet.
+
 ## 5. Test it yourself (10 min)
 
 - [ ] A wrong PIN is refused; each person's PIN opens the app as that person (Settings shows the name)
@@ -74,6 +89,7 @@ Commit. GitHub Pages republishes in about a minute. To see the demo with made-up
 - [ ] Mark complete → *Show review QR* → scan it with another phone, it opens the Google review form
 - [ ] Timetable: book a slot, block two slots, print a day (Save as PDF)
 - [ ] Each step appears as a row in the Sheet, and in the Activity tab with your name
+- [ ] Open the quiz with `?src=flyer`, finish one test → two rows in QuizStats; the Report tab shows them
 - [ ] Delete your test rows in the Sheet (Enquiries, Students, Lessons, Payments, Skills)
 
 ## 6. Install on the phones (10 min each)
