@@ -173,6 +173,20 @@ svg.bars .g{stroke:var(--line)}
 .btns .sp{flex:1}
 .selbar{position:sticky;top:0;z-index:2;display:flex;align-items:center;gap:8px;flex-wrap:wrap;background:var(--surface);border:1px solid var(--accent);border-radius:var(--r);padding:8px 10px}
 .selbar .sp{flex:1}
+.grid{display:grid;grid-template-columns:46px repeat(var(--cols),minmax(0,1fr));background:var(--surface);border:1px solid var(--line);border-radius:var(--r);overflow:clip}
+.grid .gh{position:sticky;top:0;z-index:1;background:var(--sunk);font-weight:700;font-size:13.5px;padding:8px 6px;border-left:1px solid var(--line);text-align:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.grid .gh.gt{border-left:0;font-weight:600;color:var(--muted);font-size:12px}
+.grid .gtm{font-weight:700;font-size:13px;font-variant-numeric:tabular-nums;padding:6px 4px;border-top:1px solid var(--line);display:flex;align-items:center;justify-content:center}
+.grid .gtm.now{background:var(--accent);color:var(--accent-ink)}
+.grid .gtm.past{color:var(--muted)}
+.gc{display:flex;flex-direction:column;justify-content:center;align-items:flex-start;gap:1px;min-height:46px;min-width:0;padding:4px 6px;border:0;border-top:1px solid var(--line);border-left:1px solid var(--line);background:var(--surface);text-align:left;cursor:pointer;font-size:13px;line-height:1.2}
+.gc .nm{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;word-break:break-word;font-weight:600;max-width:100%}
+.gc small{color:var(--muted);font-size:11px;font-variant-numeric:tabular-nums}
+.gc.bkd{background:var(--ok-soft);box-shadow:inset 3px 0 0 var(--ok)}
+.gc.blk{background:repeating-linear-gradient(135deg,var(--surface) 0 7px,var(--sunk) 7px 14px)}
+.gc.blk .nm{font-weight:500;color:var(--muted);font-style:italic}
+.gc.past{opacity:.55}
+.gc.sel{background:var(--accent-soft);box-shadow:inset 0 0 0 2px var(--accent)}
 .slot{display:flex;align-items:center;gap:14px;width:100%;text-align:left;border:0;border-top:1px solid var(--line);background:var(--surface);padding:8px 14px;min-height:50px;cursor:pointer}
 .slot:first-child{border-top:0}
 .slot .tm{width:50px;flex:none;font-weight:700;font-variant-numeric:tabular-nums}
@@ -196,6 +210,8 @@ svg.bars .g{stroke:var(--line)}
   #print th,#print td{border:1px solid #888;padding:3px 5px;text-align:left;vertical-align:top;overflow:hidden}
   #print th{background:#eee}
   #print .pday td{height:8.1mm}
+  #print .pday .ph{display:block;font-size:8pt;color:#444}
+  #print .pb{break-before:page}
   #print .pday th:first-child{width:27mm}
   #print .pday td:first-child{white-space:nowrap}
   #print .pday th:nth-child(3){width:28mm}
@@ -866,50 +882,59 @@ function firstName(n) { return String(n || '').split(' ')[0]; }
 function renderTimetable(m) {
   const t = T(), cars = carList();
   if (!cars.length) { m.innerHTML = `<h1>${t.timetable}</h1><div class="card"><div class="empty">${t.noCars}</div></div>`; return; }
-  if (!cars.includes(st.ttCar)) st.ttCar = cars[0];
   st.ttDate = st.ttDate || today();
-  const car = st.ttCar, d = st.ttDate, B = bookingsOn(d, car), slots = slotList(), sel = st.ttSel;
+  const d = st.ttDate, slots = slotList(), sel = st.ttSel, B = cars.map(c => bookingsOn(d, c));
   const nowMin = d === today() ? toMin(new Date(Date.now() + 5.5 * 3600e3).toISOString().slice(11, 16), 0) : (d < today() ? 1e9 : -1);
-  const nB = slots.filter(x => B[x] && B[x].Type === 'Booked').length, nK = slots.filter(x => B[x] && B[x].Type === 'Blocked').length;
+  let nB = 0, nK = 0; B.forEach(o => Object.values(o).forEach(b => b.Type === 'Blocked' ? nK++ : nB++));
+  const cols = `--cols:${cars.length}`;
   m.innerHTML = `
     <div class="ttbar">
       <button class="iconbtn" id="ttPrev" aria-label="‹">‹</button>
       <label class="ttdate"><span><b>${fd(d, true)}</b><small>${rel(d)}</small></span><input type="date" id="ttD" value="${d}" aria-label="${t.date}"></label>
       <button class="iconbtn" id="ttNext" aria-label="›">›</button>
     </div>
-    <div class="chips" role="group" aria-label="${t.car}">${cars.map(c => `<button class="chip" data-car="${esc(c)}" aria-pressed="${c === car}">${esc(c)}</button>`).join('')}</div>
     ${sel ? `<div class="selbar"><b>${t.selN(n2(sel.size))}</b><span class="sp"></span>
         <button class="btn" id="selBlock" ${sel.size ? '' : 'disabled'}>${t.blockSel}</button>
         <button class="btn" id="selFree" ${sel.size ? '' : 'disabled'}>${t.freeSel}</button>
         <button class="btn primary" id="selDone">${t.selDone}</button></div>`
       : `<div class="btns"><button class="btn" id="ttSel">${t.select}</button><span class="sp"></span><button class="btn" id="ttPD">${t.printDay}</button><button class="btn" id="ttPW">${t.printWeek}</button></div>`}
-    <p class="sub">${t.slotsSummary(n2(nB), n2(nK), n2(slots.length - nB - nK))}</p>
-    <div class="card" id="ttList">${slots.map(x => {
-      const b = B[x], past = toMin(x, 0) + 30 <= nowMin, s = b && b.Type === 'Booked' ? stuById(b.StudentID) : null;
-      const cls = (b ? (b.Type === 'Blocked' ? 'blk' : 'bkd') : 'free') + (past ? ' past' : '') + (sel && sel.has(x) ? ' sel' : '');
-      const body = !b ? `<span class="who mute">${t.free}</span>`
-        : b.Type === 'Blocked' ? `<span class="who">${t.blocked}${b.Note ? ' · ' + esc(b.Note) : ''}</span>`
-        : `<span class="who"><b>${esc(s ? s.Name : b.StudentID)}</b>${s && s.tot ? `<small>${t.lesson} ${n2(Math.min(s.done + 1, s.tot))}/${n2(s.tot)}</small>` : ''}</span>`;
-      return `<button type="button" class="slot ${cls}" data-slot="${x}" ${sel ? `aria-pressed="${sel.has(x)}"` : ''}><span class="tm">${x}</span>${body}</button>`;
-    }).join('')}</div>`;
+    <p class="sub">${t.slotsSummary(n2(nB), n2(nK), n2(slots.length * cars.length - nB - nK))}</p>
+    <div class="grid" style="${cols}" role="grid" aria-label="${t.timetable}">
+      <div class="gh gt" role="columnheader">${t.time}</div>${cars.map(c => `<div class="gh" role="columnheader">${esc(c)}</div>`).join('')}
+      ${slots.map(x => {
+        const past = toMin(x, 0) + 30 <= nowMin, now = !past && toMin(x, 0) <= nowMin;
+        return `<div class="gtm${now ? ' now' : ''}${past ? ' past' : ''}" role="rowheader">${x}</div>` + cars.map((c, i) => {
+          const b = B[i][x], k = c + '|' + x, s = b && b.Type === 'Booked' ? stuById(b.StudentID) : null;
+          const cls = (b ? (b.Type === 'Blocked' ? 'blk' : 'bkd') : 'free') + (past ? ' past' : '') + (sel && sel.has(k) ? ' sel' : '');
+          const body = !b ? '' : b.Type === 'Blocked' ? `<span class="nm">${esc(b.Note || t.blocked)}</span>`
+            : `<span class="nm">${esc(s ? s.Name : b.StudentID)}</span>${s && s.tot ? `<small>${n2(Math.min(s.done + 1, s.tot))}/${n2(s.tot)}</small>` : ''}`;
+          const label = `${c} ${x}: ${!b ? t.free : b.Type === 'Blocked' ? t.blocked : (s ? s.Name : '')}`;
+          return `<button type="button" class="gc ${cls}" data-cell="${esc(k)}" aria-label="${esc(label)}" ${sel ? `aria-pressed="${sel.has(k)}"` : ''}>${body}</button>`;
+        }).join('');
+      }).join('')}
+    </div>`;
   const go = n => { st.ttDate = addDays(d, n); st.keepScroll = false; render(); };
   $('#ttPrev').onclick = () => go(-1); $('#ttNext').onclick = () => go(1);
   $('#ttD').onchange = e => { if (e.target.value) { st.ttDate = e.target.value; st.keepScroll = false; render(); } };
-  m.querySelectorAll('[data-car]').forEach(b => b.onclick = () => { st.ttCar = b.dataset.car; st.ttSel = null; render(); });
-  m.querySelectorAll('[data-slot]').forEach(b => b.onclick = () => {
-    const x = b.dataset.slot;
-    if (st.ttSel) { st.ttSel.has(x) ? st.ttSel.delete(x) : st.ttSel.add(x); render(); }
+  m.querySelectorAll('[data-cell]').forEach(b => b.onclick = () => {
+    const k = b.dataset.cell, [car, x] = [k.slice(0, k.lastIndexOf('|')), k.slice(k.lastIndexOf('|') + 1)];
+    if (st.ttSel) { st.ttSel.has(k) ? st.ttSel.delete(k) : st.ttSel.add(k); render(); }
     else openSlot(car, d, x);
   });
   if (sel) {
     $('#selDone').onclick = () => { st.ttSel = null; render(); };
-    $('#selBlock').onclick = () => openBlock(car, d, [...sel].sort());
-    $('#selFree').onclick = async () => { const L = [...sel]; st.ttSel = null; await act('clearSlots', { Car: car, Date: d, Slots: L }, t.saved); };
+    $('#selBlock').onclick = () => openBlock(d, [...sel]);
+    $('#selFree').onclick = async () => {
+      const g = byCar([...sel]); st.ttSel = null;
+      for (const car of Object.keys(g)) { try { await act('clearSlots', { Car: car, Date: d, Slots: g[car] }); } catch (e) { break; } }
+      toast(t.saved);
+    };
   } else {
     $('#ttSel').onclick = () => { st.ttSel = new Set(); render(); };
     $('#ttPD').onclick = () => printTT('day'); $('#ttPW').onclick = () => printTT('week');
   }
 }
+function byCar(keys) { const g = {}; keys.forEach(k => { const i = k.lastIndexOf('|'); (g[k.slice(0, i)] = g[k.slice(0, i)] || []).push(k.slice(i + 1)); }); Object.values(g).forEach(a => a.sort()); return g; }
 
 function openSlot(car, d, x) {
   const t = T(), b = bookingsOn(d, car)[x], title = `${car} · ${x}–${slotEnd(x)} · ${fd(d)}`;
@@ -921,7 +946,7 @@ function openSlot(car, d, x) {
         <button class="btn primary big" type="submit">${t.bookStudent}</button></form>
       <button class="btn big" id="bBlk">${t.blockSlot}</button>`, () => {
       $('#fB').onsubmit = async e => { e.preventDefault(); if (!$('#bS').value) return; try { await act('setSlots', { Car: car, Date: d, Slots: [x], Type: 'Booked', StudentID: $('#bS').value, Note: $('#bN').value.trim() }, t.saved); closeSheet(); } catch (z) { closeSheet(); } };
-      $('#bBlk').onclick = () => openBlock(car, d, [x]);
+      $('#bBlk').onclick = () => openBlock(d, [car + '|' + x]);
     });
     return;
   }
@@ -942,17 +967,19 @@ function openSlot(car, d, x) {
   });
 }
 
-function openBlock(car, d, slots) {
-  const t = T();
-  sheet(`${t.blockSlot} · ${car}`, `<p class="sub">${fd(d, true)} · ${slots.map(x => x).join(', ')}</p>
+function openBlock(d, keys) {
+  const t = T(), g = byCar(keys);
+  sheet(t.blockSlot, `<p class="sub">${fd(d, true)}<br>${Object.keys(g).map(c => `${esc(c)}: ${g[c].join(', ')}`).join('<br>')}</p>
     <form id="fK" style="display:flex;flex-direction:column;gap:12px">
       <div class="f"><label for="kR">${t.reason}</label><input id="kR" maxlength="60" placeholder="${t.reasonPh}" autocomplete="off"></div>
       <label class="sw"><input type="checkbox" id="kW"> ${t.repeat7}</label>
       <button class="btn primary big" type="submit">${t.blockSel}</button></form>`, () => {
     $('#fK').onsubmit = async e => {
       e.preventDefault(); st.ttSel = null;
-      try { await act('setSlots', { Car: car, Date: d, Slots: slots, Type: 'Blocked', Note: $('#kR').value.trim(), Days: $('#kW').checked ? 7 : 1 }, t.saved); } catch (z) { }
+      const note = $('#kR').value.trim(), days = $('#kW').checked ? 7 : 1;
       closeSheet();
+      for (const car of Object.keys(g)) { try { await act('setSlots', { Car: car, Date: d, Slots: g[car], Type: 'Blocked', Note: note, Days: days }); } catch (z) { return; } }
+      toast(t.saved);
     };
   });
 }
@@ -963,18 +990,19 @@ function printTT(kind) {
   const cellFor = b => { if (!b) return ''; if (b.Type === 'Blocked') return `<i>${t.blocked}${b.Note ? ': ' + esc(b.Note) : ''}</i>`; const s = stuById(b.StudentID); return esc(s ? s.Name : b.StudentID); };
   let html, orient;
   if (kind === 'day') {
-    const d = st.ttDate, B = bookingsOn(d, car); orient = 'portrait';
-    html = `<h1>${esc(school)} · ${esc(car)}</h1><h2>${fd(d, true)} ${d.slice(0, 4)}</h2>
-      <table class="pday"><thead><tr><th>${t.time}</th><th>${t.student}</th><th>${t.phone}</th><th>${t.note}</th><th>${t.tick}</th></tr></thead><tbody>
-      ${slots.map(x => { const b = B[x], s = b && b.Type === 'Booked' ? stuById(b.StudentID) : null; return `<tr class="${b && b.Type === 'Blocked' ? 'k' : ''}"><td>${x}–${slotEnd(x)}</td><td>${cellFor(b)}</td><td>${s ? esc(s.Phone) : ''}</td><td>${b && b.Type === 'Booked' ? esc(b.Note || '') : ''}</td><td></td></tr>`; }).join('')}
+    const d = st.ttDate, cars = carList(), Bs = cars.map(c => bookingsOn(d, c)); orient = cars.length > 3 ? 'landscape' : 'portrait';
+    html = `<h1>${esc(school)}</h1><h2>${t.timetable} · ${fd(d, true)} ${d.slice(0, 4)}</h2>
+      <table class="pday"><thead><tr><th>${t.time}</th>${cars.map(c => `<th>${esc(c)}</th>`).join('')}</tr></thead><tbody>
+      ${slots.map(x => `<tr><td>${x}–${slotEnd(x)}</td>${Bs.map(B => { const b = B[x], s = b && b.Type === 'Booked' ? stuById(b.StudentID) : null;
+        return `<td class="${b && b.Type === 'Blocked' ? 'k' : ''}">${cellFor(b)}${s && s.Phone ? `<span class="ph">${esc(s.Phone)}</span>` : ''}</td>`; }).join('')}</tr>`).join('')}
       </tbody></table>`;
   } else {
     const w0 = weekStart(st.ttDate), days = Array.from({ length: 7 }, (_, i) => addDays(w0, i)); orient = 'landscape';
-    const Bs = days.map(d => bookingsOn(d, car));
-    html = `<h1>${esc(school)} · ${esc(car)}</h1><h2>${fd(days[0])} – ${fd(days[6])} ${days[6].slice(0, 4)}</h2>
+    html = carList().map((car, ci) => { const Bs = days.map(d => bookingsOn(d, car));
+      return `<section class="${ci ? 'pb' : ''}"><h1>${esc(school)} · ${esc(car)}</h1><h2>${fd(days[0])} – ${fd(days[6])} ${days[6].slice(0, 4)}</h2>
       <table class="pweek"><thead><tr><th>${t.time}</th>${days.map(d => `<th>${fd(d, true)}</th>`).join('')}</tr></thead><tbody>
-      ${slots.map(x => `<tr><td class="tm">${x}</td>${Bs.map(B => `<td class="${B[x] && B[x].Type === 'Blocked' ? 'k' : ''}">${B[x] && B[x].Type === 'Booked' ? esc(firstName((stuById(B[x].StudentID) || {}).Name || '')) : cellFor(B[x])}</td>`).join('')}</tr>`).join('')}
-      </tbody></table>`;
+      ${slots.map(x => `<tr><td class="tm">${x}</td>${Bs.map(B => `<td class="${B[x] && B[x].Type === 'Blocked' ? 'k' : ''}">${B[x] && B[x].Type === 'Booked' ? esc((stuById(B[x].StudentID) || {}).Name || '') : cellFor(B[x])}</td>`).join('')}</tr>`).join('')}
+      </tbody></table></section>`; }).join('');
   }
   $('#print').innerHTML = `<style>@page{size:A4 ${orient};margin:9mm}</style>${html}<p class="pfoot">${t.printedOn} ${fd(today())} · ${esc(st.me || '')}</p>`;
   toast(t.printHint);
