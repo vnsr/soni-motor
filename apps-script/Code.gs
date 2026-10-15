@@ -16,7 +16,7 @@
  *   The /exec URL stays the same, so the app needs no change.
  */
 
-const VERSION = '1.2.1';
+const VERSION = '1.2.2';
 const MAX_FAILS = 8, LOCK_SECONDS = 15 * 60;   // wrong-PIN protection
 
 const TABS = {
@@ -248,6 +248,8 @@ function pick_(p, keys) { const o = {}; keys.forEach(function (k) { if (p[k] !==
 /** Creates missing tabs and columns. Safe to run again; never deletes anything. */
 function setup() {
   const ss = SpreadsheetApp.getActive();
+  if (!ss) throw new Error('This script is not attached to a Google Sheet. Open the Sheet → Extensions → Apps Script and paste the code there.');
+  Logger.log('Setting up: "' + ss.getName() + '"');
   ss.setSpreadsheetTimeZone('Asia/Kolkata');
   Object.keys(TABS).forEach(function (name) {
     let sh = ss.getSheetByName(name);
