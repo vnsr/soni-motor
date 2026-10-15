@@ -1,6 +1,6 @@
 // Soni Motor offline cache: keeps the app itself on the phone so it opens without signal.
 // Student data is never cached here; it comes from the Google Sheet (the app keeps only the last loaded copy).
-const CACHE = 'soni-motor-v1-2-1';
+const CACHE = 'soni-motor-v1-2-2';
 const FILES = ['./', './index.html', './config.js', './manifest.webmanifest', './icon-180.png', './icon-192.png', './icon-512.png', './lib/qrcode.js'];
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(FILES)).then(() => self.skipWaiting()));

@@ -2,5 +2,5 @@
    API_URL: the Web app URL from the Sheet's Apps Script (Deploy → Manage deployments), ending in /exec.
    Leave it empty to run the app as a demo with made-up data. */
 window.SONI_CONFIG = {
-  API_URL: ''
+  API_URL: 'https://script.google.com/macros/s/AKfycbymQZCN4zQ8IBHXljd3GtIF4TMR8D-xi3ungKV7vneOs0ibXj5ldNoz-pzeiRF-cbet/exec'
 };
