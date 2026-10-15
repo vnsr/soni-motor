@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="gu">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta property="og:title" content="લર્નિંગ લાઇસન્સ પ્રેક્ટિસ ટેસ્ટ · Soni Motor">
+<meta property="og:description" content="RTO ટેસ્ટ જેવા 15 પ્રશ્નો, ગુજરાતી અને અંગ્રેજીમાં. Free learner's licence practice test.">
+<meta property="og:image" content="https://vnsr.github.io/soni-motor/icon-512.png">
+<link rel="icon" href="../icon-192.png">
+<link rel="apple-touch-icon" href="../icon-180.png">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}[hidden]{display:none!important}</style>
+<title>Soni Motor LL Practice</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Free learner's licence practice test in Gujarati and English, from Soni Motor Training School, Vadodara.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Hind+Vadodara:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: one narrow column like an RTO test screen — lane-marking progress strip, sign plate, three answer buttons */
+:root{
+  --bg:#EEF1F4; --surface:#FFFFFF; --sunk:#E3E7EC; --fg:#15191F; --muted:#59616D; --line:#D3D9E0;
+  --accent:#C41E2A; --accent-soft:#FBE3E4; --accent-ink:#FFFFFF;
+  --sign-blue:#1F5FA8; --ok:#1B7A47; --ok-soft:#DDF2E5; --bad:#B4232F; --bad-soft:#FBE3E4; --lane:#C9D0D8;
+  --f-body:'Hind Vadodara','Noto Sans Gujarati','Shruti',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --f-disp:'Barlow Condensed','Hind Vadodara','Arial Narrow',system-ui,sans-serif;
+  --r:14px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0F1216; --surface:#181C22; --sunk:#222831; --fg:#EBEEF2; --muted:#9EA6B2; --line:#2E353F;
+  --accent:#FF6B74; --accent-soft:#3B1A1E; --accent-ink:#0F1216;
+  --sign-blue:#5C9BE6; --ok:#5ACB8A; --ok-soft:#142E20; --bad:#FF7A84; --bad-soft:#3B1A1E; --lane:#39414C; color-scheme:dark }}
+:root[data-theme="dark"]{
+  --bg:#0F1216; --surface:#181C22; --sunk:#222831; --fg:#EBEEF2; --muted:#9EA6B2; --line:#2E353F;
+  --accent:#FF6B74; --accent-soft:#3B1A1E; --accent-ink:#0F1216;
+  --sign-blue:#5C9BE6; --ok:#5ACB8A; --ok-soft:#142E20; --bad:#FF7A84; --bad-soft:#3B1A1E; --lane:#39414C; color-scheme:dark }
+
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0}
+body{background:var(--bg);color:var(--fg);font:17px/1.5 var(--f-body)}
+button{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.wrap{max-width:560px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:14px 40px;display:flex;flex-direction:column;gap:16px}
+
+header.top{display:flex;align-items:center;gap:10px}
+.lplate{width:38px;height:38px;flex:none;border-radius:7px;background:#fff;border:2.5px solid #C41E2A;display:grid;place-items:center;font:700 26px/1 var(--f-disp);color:#C41E2A}
+.brand{flex:1;min-width:0;line-height:1.15}
+.brand b{display:block;font-size:17px}
+.brand span{font-size:13px;color:var(--muted)}
+.lang{display:inline-flex;border:1px solid var(--line);border-radius:999px;overflow:hidden;background:var(--surface)}
+.lang button{border:0;background:none;padding:5px 12px;font-size:14px;cursor:pointer;color:var(--muted);min-height:34px}
+.lang button[aria-pressed="true"]{background:var(--fg);color:var(--bg)}
+
+h1{font-size:24px;line-height:1.2;margin:0;text-wrap:balance}
+.intro{margin:4px 0 0;color:var(--muted);font-size:15px;max-width:60ch}
+
+/* progress: 15 lane dashes */
+.lane{display:grid;grid-template-columns:repeat(15,1fr);gap:4px;align-items:center}
+.lane i{height:6px;border-radius:2px;background:var(--lane)}
+.lane i.cur{background:var(--fg)}
+.lane i.ok{background:var(--ok)}
+.lane i.bad{background:var(--bad)}
+.meta{display:flex;justify-content:space-between;gap:10px;font-size:14px;color:var(--muted);font-variant-numeric:tabular-nums}
+.meta b{font:700 18px/1 var(--f-disp);color:var(--fg);letter-spacing:.02em}
+
+.q{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:18px 16px;display:flex;flex-direction:column;gap:14px}
+.plate{align-self:center;width:136px;height:136px;display:grid;place-items:center;background:var(--sunk);border-radius:12px}
+.plate svg{width:112px;height:112px;display:block}
+.qt{font-size:19px;font-weight:600;line-height:1.35;margin:0;text-wrap:pretty}
+.opts{display:flex;flex-direction:column;gap:10px}
+.opt{display:flex;align-items:flex-start;gap:12px;width:100%;text-align:left;border:1.5px solid var(--line);background:var(--surface);border-radius:12px;padding:12px 14px;min-height:56px;cursor:pointer;font-size:16.5px;line-height:1.35}
+.opt .k{flex:none;width:28px;height:28px;border-radius:50%;background:var(--sunk);display:grid;place-items:center;font:700 16px/1 var(--f-disp);color:var(--muted)}
+.opt:hover:not([disabled]){border-color:var(--fg)}
+.opt[disabled]{cursor:default}
+.opt.right{border-color:var(--ok);background:var(--ok-soft)}
+.opt.right .k{background:var(--ok);color:var(--accent-ink)}
+.opt.wrong{border-color:var(--bad);background:var(--bad-soft)}
+.opt.wrong .k{background:var(--bad);color:var(--accent-ink)}
+.opt.dim{opacity:.6}
+
+.fb{border-radius:12px;padding:12px 14px;font-size:15.5px;display:flex;flex-direction:column;gap:2px}
+.fb.ok{background:var(--ok-soft)}
+.fb.bad{background:var(--bad-soft)}
+.fb b{font-size:16px}
+.fb.ok b{color:var(--ok)} .fb.bad b{color:var(--bad)}
+
+.btn{border:0;border-radius:12px;min-height:52px;padding:10px 18px;font-weight:700;font-size:17px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;text-align:center}
+.btn.primary{background:var(--accent);color:var(--accent-ink)}
+.btn.ghost{background:var(--surface);border:1.5px solid var(--line);color:var(--fg)}
+.btn.wa{background:var(--ok);color:var(--accent-ink)}
+.btn.full{width:100%}
+
+/* result */
+.score{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:20px 16px;display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center}
+.score .num{font:700 68px/1 var(--f-disp);font-variant-numeric:tabular-nums;letter-spacing:.01em}
+.score .num small{font-size:34px;color:var(--muted)}
+.verdict{font-weight:700;font-size:18px}
+.verdict.ok{color:var(--ok)} .verdict.bad{color:var(--bad)}
+.score p{margin:0;color:var(--muted);font-size:15px;max-width:42ch}
+h2{font-size:18px;margin:0}
+.review{display:flex;flex-direction:column;gap:10px}
+.ritem{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 14px;display:flex;gap:12px;align-items:flex-start}
+.ritem svg{width:52px;height:52px;flex:none}
+.ritem div{min-width:0;font-size:15px}
+.ritem .rq{font-weight:600}
+.ritem .ra{color:var(--ok)}
+.school{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px;display:flex;flex-direction:column;gap:10px}
+.school p{margin:0;font-size:15px;color:var(--muted)}
+.school .num2{font-weight:700;color:var(--fg);user-select:all;font-variant-numeric:tabular-nums}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.note{font-size:13px;color:var(--muted);margin:0}
+@media (prefers-reduced-motion:no-preference){.q,.score{animation:in .22s ease-out}@keyframes in{from{transform:translateY(6px);opacity:.4}to{transform:none;opacity:1}}}
+</style>
+
+</head>
+<body>
+<div class="wrap" id="root"></div>
+
+<script>
+/* ===== school details (fill SCHOOL_PHONE with the WhatsApp number, 10 digits) ===== */
+const SCHOOL_PHONE = '';
+const ROUND = 15, TARGET = 12;
+
+/* ===== road-sign drawings (viewBox 0 0 120 120) ===== */
+const RED = '#C8102E', BLUE = '#1F5FA8', BLK = '#111';
+const svg = inner => `<svg viewBox="0 0 120 120" role="img" aria-hidden="true">${inner}</svg>`;
+const ring = (inner, slash) => svg(`<circle cx="60" cy="60" r="52" fill="#fff" stroke="${RED}" stroke-width="11"/>${inner}${slash ? `<line x1="26" y1="26" x2="94" y2="94" stroke="${RED}" stroke-width="10" stroke-linecap="round"/>` : ''}`);
+const blueDisc = inner => svg(`<circle cx="60" cy="60" r="56" fill="${BLUE}"/><circle cx="60" cy="60" r="52" fill="none" stroke="#fff" stroke-width="3"/>${inner}`);
+const warn = inner => svg(`<path d="M60 10 L112 102 H8 Z" fill="#fff" stroke="${RED}" stroke-width="10" stroke-linejoin="round"/>${inner}`);
+const arrowL = c => `<path d="M72 94 V58 H48" fill="none" stroke="${c}" stroke-width="11" stroke-linejoin="round"/><path d="M50 42 V74 L28 58 Z" fill="${c}"/>`;
+const oct = (() => { const p = []; for (let i = 0; i < 8; i++) { const a = Math.PI / 8 + i * Math.PI / 4; p.push((60 + 57 * Math.cos(a)).toFixed(1) + ',' + (60 + 57 * Math.sin(a)).toFixed(1)); } return p.join(' '); })();
+const light = (lit, flash) => {
+  const C = { red: '#E3262F', amber: '#F5A511', green: '#22A45D' }, off = '#4A4F57';
+  const lamp = (k, cy) => `<circle cx="60" cy="${cy}" r="13" fill="${lit === k ? C[k] : off}"/>`;
+  const cy = { red: 30, amber: 60, green: 90 }[lit];
+  const rays = flash ? [[-30, 0], [30, 0], [-24, -16], [24, -16], [-24, 16], [24, 16]].map(([x, y]) => `<line x1="${60 + x * .75}" y1="${cy + y * .75}" x2="${60 + x}" y2="${cy + y}" stroke="${C[lit]}" stroke-width="4" stroke-linecap="round"/>`).join('') : '';
+  return svg(`<rect x="40" y="10" width="40" height="100" rx="9" fill="#23272E"/>${lamp('red', 30)}${lamp('amber', 60)}${lamp('green', 90)}${rays}`);
+};
+const SIGNS = {
+  stop: svg(`<polygon points="${oct}" fill="${RED}" stroke="#fff" stroke-width="4"/><text x="60" y="71" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-weight="700" font-size="30" fill="#fff">STOP</text>`),
+  giveway: svg(`<path d="M10 20 H110 L60 106 Z" fill="#fff" stroke="${RED}" stroke-width="11" stroke-linejoin="round"/>`),
+  noentry: svg(`<circle cx="60" cy="60" r="56" fill="${RED}"/><rect x="22" y="50" width="76" height="20" fill="#fff"/>`),
+  nohorn: ring(`<rect x="28" y="55" width="30" height="10" rx="3" fill="${BLK}"/><path d="M56 57 L88 38 Q93 60 88 82 L56 63 Z" fill="${BLK}"/>`, true),
+  noparking: ring(`<text x="60" y="80" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-weight="700" font-size="58" fill="${BLK}">P</text>`, true),
+  nouturn: ring(`<path d="M48 92 V52 A14 14 0 0 1 76 52 V64" fill="none" stroke="${BLK}" stroke-width="10"/><path d="M64 62 H88 L76 82 Z" fill="${BLK}"/>`, true),
+  noleft: ring(arrowL(BLK), true),
+  speed50: ring(`<text x="60" y="76" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-weight="700" font-size="44" fill="${BLK}">50</text>`),
+  turnleft: blueDisc(arrowL('#fff')),
+  keepleft: blueDisc(`<line x1="80" y1="38" x2="50" y2="68" stroke="#fff" stroke-width="11" stroke-linecap="round"/><path d="M34 84 L40 56 L62 78 Z" fill="#fff"/>`),
+  ahead: blueDisc(`<line x1="60" y1="94" x2="60" y2="48" stroke="#fff" stroke-width="11"/><path d="M42 52 H78 L60 26 Z" fill="#fff"/>`),
+  crossroad: warn(`<rect x="55" y="44" width="10" height="48" fill="${BLK}"/><rect x="38" y="63" width="44" height="10" fill="${BLK}"/>`),
+  rightcurve: warn(`<path d="M54 96 V78 C54 64 58 58 67 53.5" fill="none" stroke="${BLK}" stroke-width="9"/><path d="M80 44 L72.5 61.5 L60.5 46 Z" fill="${BLK}"/>`),
+  narrow: warn(`<path d="M42 96 L50 78 V50 M78 96 L70 78 V50" fill="none" stroke="${BLK}" stroke-width="8" stroke-linejoin="round"/>`),
+  hump: warn(`<path d="M26 92 Q60 50 94 92 Z" fill="${BLK}"/>`),
+  pedestrian: warn(`<circle cx="62" cy="44" r="6.5" fill="${BLK}"/><path d="M61 52 L56 72 M56 72 L47 87 M56 72 L67 87 M59 58 L47 66 M59 58 L70 64" stroke="${BLK}" stroke-width="6" stroke-linecap="round" fill="none"/><g fill="${BLK}">${[32, 44, 56, 68, 80].map(x => `<rect x="${x}" y="91" width="7" height="5"/>`).join('')}</g>`),
+  parking: svg(`<rect x="10" y="10" width="100" height="100" rx="12" fill="${BLUE}"/><rect x="15" y="15" width="90" height="90" rx="9" fill="none" stroke="#fff" stroke-width="3"/><text x="60" y="84" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-weight="700" font-size="66" fill="#fff">P</text>`),
+  redflash: light('red', true),
+  amberflash: light('amber', true),
+  amber: light('amber', false)
+};
+
+/* ===== question bank: [sign, {en:[question, right, wrong1, wrong2, why], gu:[...]}] =====
+   Written by the school from the Motor Vehicles Act and the rules of the road; not copied from any official bank. */
+const Q_SIGN_EN = 'What does this sign mean?', Q_SIGN_GU = 'આ ચિહ્નનો અર્થ શું છે?';
+const BANK = [
+  ['stop', { en: [Q_SIGN_EN, 'Stop completely, then go only when it is safe', 'Slow down', 'No parking', 'You must come to a full stop even if the road looks clear.'],
+    gu: [Q_SIGN_GU, 'પૂરેપૂરા રોકાઓ, પછી સલામત હોય ત્યારે જ આગળ વધો', 'ધીમા પડો', 'પાર્કિંગ નહીં', 'રસ્તો ખાલી દેખાય તો પણ ગાડી પૂરેપૂરી રોકવી પડે.'] }],
+  ['giveway', { en: [Q_SIGN_EN, 'Give way to traffic on the main road', 'Road closed', 'Stop and switch off the engine', 'Slow down and let traffic on the main road pass first. Stop only if needed.'],
+    gu: [Q_SIGN_GU, 'મુખ્ય રસ્તાના ટ્રાફિકને પહેલાં જવા દો', 'રસ્તો બંધ છે', 'રોકાઈને એન્જિન બંધ કરો', 'ધીમા પડી મુખ્ય રસ્તાના વાહનોને પહેલાં જવા દો. જરૂર પડે તો જ રોકાઓ.'] }],
+  ['noentry', { en: [Q_SIGN_EN, 'No entry for any vehicle', 'Dead end ahead', 'Parking area', 'Vehicles must not enter the road from this side.'],
+    gu: [Q_SIGN_GU, 'કોઈ પણ વાહનને પ્રવેશ નહીં', 'આગળ રસ્તો બંધ (ડેડ એન્ડ)', 'પાર્કિંગની જગ્યા', 'આ બાજુથી રસ્તામાં કોઈ વાહન પ્રવેશી શકે નહીં.'] }],
+  ['nohorn', { en: [Q_SIGN_EN, 'Horn prohibited', 'Sound the horn', 'Loudspeaker area', 'Common near hospitals, schools and courts. Do not sound the horn here.'],
+    gu: [Q_SIGN_GU, 'હોર્ન વગાડવાની મનાઈ', 'હોર્ન વગાડો', 'લાઉડસ્પીકર વિસ્તાર', 'હૉસ્પિટલ, શાળા અને કોર્ટ પાસે આ ચિહ્ન હોય છે. અહીં હોર્ન ન વગાડો.'] }],
+  ['noparking', { en: [Q_SIGN_EN, 'No parking', 'Parking allowed', 'Petrol pump ahead', 'A red circle with a slash means something is prohibited. Here, parking.'],
+    gu: [Q_SIGN_GU, 'પાર્કિંગની મનાઈ', 'પાર્કિંગની છૂટ', 'આગળ પેટ્રોલ પંપ', 'લાલ ગોળામાં ત્રાંસી લીટી એટલે મનાઈ. અહીં પાર્કિંગની મનાઈ છે.'] }],
+  ['parking', { en: [Q_SIGN_EN, 'Parking allowed here', 'No parking', 'Police station', 'Blue rectangular signs give information. This one marks a parking place.'],
+    gu: [Q_SIGN_GU, 'અહીં પાર્કિંગ કરી શકાય', 'પાર્કિંગની મનાઈ', 'પોલીસ સ્ટેશન', 'વાદળી લંબચોરસ ચિહ્નો માહિતી આપે છે. આ ચિહ્ન પાર્કિંગની જગ્યા બતાવે છે.'] }],
+  ['nouturn', { en: [Q_SIGN_EN, 'U-turn prohibited', 'U-turn ahead', 'Turn right', 'Do not turn back here.'],
+    gu: [Q_SIGN_GU, 'યુ-ટર્નની મનાઈ', 'આગળ યુ-ટર્ન છે', 'જમણે વળો', 'અહીંથી ગાડી પાછી ન વાળો.'] }],
+  ['noleft', { en: [Q_SIGN_EN, 'Left turn prohibited', 'Compulsory left turn', 'Left curve ahead', 'The slash across the arrow means you may not turn left here.'],
+    gu: [Q_SIGN_GU, 'ડાબે વળવાની મનાઈ', 'ડાબે વળવું ફરજિયાત', 'આગળ ડાબો વળાંક', 'તીર પર ત્રાંસી લીટી એટલે અહીં ડાબે વળી શકાય નહીં.'] }],
+  ['speed50', { en: [Q_SIGN_EN, 'Maximum speed 50 km/h', 'Minimum speed 50 km/h', 'Junction in 50 metres', 'A number in a red circle is the speed you must not exceed.'],
+    gu: [Q_SIGN_GU, 'વધુમાં વધુ ઝડપ 50 કિમી/કલાક', 'ઓછામાં ઓછી ઝડપ 50 કિમી/કલાક', '50 મીટર પછી ચાર રસ્તા', 'લાલ ગોળામાં લખેલો આંકડો એટલે તેનાથી વધુ ઝડપે ન ચલાવો.'] }],
+  ['turnleft', { en: [Q_SIGN_EN, 'Compulsory turn left', 'Left turn prohibited', 'Left curve ahead', 'Blue circles are orders: you must turn left.'],
+    gu: [Q_SIGN_GU, 'ડાબે વળવું ફરજિયાત', 'ડાબે વળવાની મનાઈ', 'આગળ ડાબો વળાંક', 'વાદળી ગોળ ચિહ્ન એટલે આદેશ: ડાબે વળવું જ પડે.'] }],
+  ['keepleft', { en: [Q_SIGN_EN, 'Keep left', 'Turn left now', 'No entry from the left', 'Pass on the left side of the divider or obstruction.'],
+    gu: [Q_SIGN_GU, 'ડાબી બાજુએ રહો', 'હમણાં જ ડાબે વળો', 'ડાબેથી પ્રવેશ નહીં', 'ડિવાઇડર કે અડચણની ડાબી બાજુએથી પસાર થાઓ.'] }],
+  ['ahead', { en: [Q_SIGN_EN, 'Go straight ahead only', 'One-way road', 'Overtaking allowed', 'Blue circles are orders: you may only go straight on.'],
+    gu: [Q_SIGN_GU, 'ફક્ત સીધા જ જાઓ', 'એકમાર્ગી રસ્તો', 'ઓવરટેકની છૂટ', 'વાદળી ગોળ ચિહ્ન એટલે આદેશ: ફક્ત સીધા જ જઈ શકાય.'] }],
+  ['crossroad', { en: [Q_SIGN_EN, 'Crossroads ahead', 'Hospital ahead', 'Railway crossing ahead', 'Red triangles warn you of something ahead. Slow down at the junction.'],
+    gu: [Q_SIGN_GU, 'આગળ ચાર રસ્તા', 'આગળ હૉસ્પિટલ', 'આગળ રેલવે ફાટક', 'લાલ ત્રિકોણ ચિહ્ન આગળના જોખમની ચેતવણી આપે છે. ચાર રસ્તે ધીમા પડો.'] }],
+  ['rightcurve', { en: [Q_SIGN_EN, 'Right-hand curve ahead', 'Turn right now', 'Right turn prohibited', 'A warning: the road bends to the right. Slow down before the bend.'],
+    gu: [Q_SIGN_GU, 'આગળ જમણો વળાંક', 'હમણાં જ જમણે વળો', 'જમણે વળવાની મનાઈ', 'ચેતવણી: આગળ રસ્તો જમણી તરફ વળે છે. વળાંક પહેલાં ધીમા પડો.'] }],
+  ['narrow', { en: [Q_SIGN_EN, 'Road narrows ahead', 'Road widens ahead', 'Two-way traffic', 'There is less room ahead. Slow down and keep left.'],
+    gu: [Q_SIGN_GU, 'આગળ રસ્તો સાંકડો થાય છે', 'આગળ રસ્તો પહોળો થાય છે', 'બંને દિશાનો ટ્રાફિક', 'આગળ જગ્યા ઓછી છે. ધીમા પડો અને ડાબી બાજુએ રહો.'] }],
+  ['hump', { en: [Q_SIGN_EN, 'Speed breaker ahead', 'Hill top ahead', 'Steep descent', 'Slow down before the hump.'],
+    gu: [Q_SIGN_GU, 'આગળ સ્પીડ બ્રેકર', 'આગળ ટેકરીની ટોચ', 'આગળ સીધો ઢાળ', 'બમ્પ આવે તે પહેલાં ધીમા પડો.'] }],
+  ['pedestrian', { en: [Q_SIGN_EN, 'Pedestrian crossing ahead', 'Pedestrians not allowed', 'Bus stop ahead', 'Be ready to stop for people crossing.'],
+    gu: [Q_SIGN_GU, 'આગળ રાહદારીઓ માટે ક્રોસિંગ', 'રાહદારીઓની મનાઈ', 'આગળ બસ સ્ટોપ', 'રસ્તો ઓળંગતા લોકો માટે રોકાવા તૈયાર રહો.'] }],
+  ['redflash', { en: ['The red light is flashing. What should you do?', 'Stop, then go when it is safe', 'Go without stopping', 'Turn back', 'A flashing red light works like a STOP sign.'],
+    gu: ['લાલ લાઇટ ઝબકે છે. તમારે શું કરવું?', 'રોકાઓ, પછી સલામત હોય ત્યારે આગળ વધો', 'રોકાયા વગર જાઓ', 'પાછા વળો', 'ઝબકતી લાલ લાઇટ STOP ચિહ્ન જેવું જ કામ કરે છે.'] }],
+  ['amberflash', { en: ['The amber light is flashing. What should you do?', 'Slow down and go with care', 'Stop and wait for green', 'Speed up and cross', 'Flashing amber means the signal is not in control. Proceed carefully.'],
+    gu: ['પીળી લાઇટ ઝબકે છે. તમારે શું કરવું?', 'ધીમા પડી સાવચેતીથી આગળ વધો', 'રોકાઈને લીલી લાઇટની રાહ જુઓ', 'ઝડપ વધારીને પસાર થઈ જાઓ', 'ઝબકતી પીળી લાઇટ એટલે સિગ્નલ બંધ છે. સાવચેતીથી આગળ વધો.'] }],
+  ['amber', { en: ['The light changes from green to amber. What should you do?', 'Stop before the line if you can do so safely', 'Speed up to cross before red', 'Sound the horn and go', 'Amber means red is next. Stop unless you are too close to stop safely.'],
+    gu: ['લાઇટ લીલીમાંથી પીળી થાય છે. તમારે શું કરવું?', 'સલામત રીતે રોકાઈ શકો તો લાઇન પહેલાં રોકાઓ', 'લાલ થાય તે પહેલાં ઝડપથી પસાર થાઓ', 'હોર્ન વગાડીને જાઓ', 'પીળી પછી લાલ આવે છે. બહુ નજીક ન હો તો રોકાઈ જાઓ.'] }],
+
+  [null, { en: ['From which side should you overtake?', 'From the right', 'From the left', 'From either side', 'In India we keep left, so overtaking is done from the right.'],
+    gu: ['ઓવરટેક કઈ બાજુથી કરવો જોઈએ?', 'જમણી બાજુથી', 'ડાબી બાજુથી', 'કોઈ પણ બાજુથી', 'ભારતમાં ડાબી બાજુ ચલાવાય છે, એટલે ઓવરટેક જમણી બાજુથી થાય.'] }],
+  [null, { en: ['Another vehicle is overtaking you. What should you do?', 'Keep left and do not speed up', 'Speed up', 'Move to the centre of the road', 'Make it easy and safe for the other driver to pass.'],
+    gu: ['બીજું વાહન તમને ઓવરટેક કરે છે. તમારે શું કરવું?', 'ડાબી બાજુએ રહો અને ઝડપ ન વધારો', 'ઝડપ વધારો', 'રસ્તાની વચ્ચે આવી જાઓ', 'બીજા ડ્રાઇવરને સલામત રીતે આગળ જવા દો.'] }],
+  [null, { en: ['When is overtaking not allowed?', 'On a bend, a bridge, or when you cannot see the road ahead clearly', 'On a straight road with a clear view', 'When the vehicle ahead is very slow', 'Overtake only when the road ahead is clear and you can see far enough.'],
+    gu: ['ઓવરટેક ક્યારે ન કરી શકાય?', 'વળાંક પર, પુલ પર, અથવા આગળનો રસ્તો બરાબર ન દેખાય ત્યારે', 'સીધા અને ખુલ્લા રસ્તા પર', 'આગળનું વાહન ખૂબ ધીમું હોય ત્યારે', 'આગળ રસ્તો ખાલી હોય અને દૂર સુધી દેખાય ત્યારે જ ઓવરટેક કરો.'] }],
+  [null, { en: ['At a junction with no signal or police, you should give way to:', 'Traffic coming from your right', 'Traffic coming from your left', 'Smaller vehicles', 'At an uncontrolled junction, give way to vehicles approaching from the right.'],
+    gu: ['સિગ્નલ કે પોલીસ વગરના ચાર રસ્તે કોને પહેલાં જવા દેવા?', 'જમણી બાજુથી આવતા વાહનોને', 'ડાબી બાજુથી આવતા વાહનોને', 'નાના વાહનોને', 'સિગ્નલ વગરના ચાર રસ્તે જમણી બાજુથી આવતા વાહનોને પહેલાં જવા દો.'] }],
+  [null, { en: ['An ambulance or fire engine with a siren comes behind you. You should:', 'Move to the left and let it pass', 'Speed up to stay ahead of it', 'Stop in the middle of the road', 'Emergency vehicles always get the way. Pull to the left when it is safe.'],
+    gu: ['સાયરન વગાડતી ઍમ્બ્યુલન્સ કે ફાયર બ્રિગેડ પાછળ આવે ત્યારે:', 'ડાબી બાજુ ખસી તેને જવા દો', 'તેનાથી આગળ રહેવા ઝડપ વધારો', 'રસ્તાની વચ્ચે ઊભા રહી જાઓ', 'ઇમરજન્સી વાહનને હંમેશાં રસ્તો આપો. સલામત હોય ત્યારે ડાબી બાજુ ખસો.'] }],
+  [null, { en: ['People are waiting at a zebra crossing. You should:', 'Stop and let them cross', 'Sound the horn and go on', 'Speed up to pass first', 'Pedestrians have priority at a zebra crossing.'],
+    gu: ['ઝીબ્રા ક્રોસિંગ પર લોકો રસ્તો ઓળંગવા ઊભા છે. તમારે:', 'રોકાઈને તેમને જવા દો', 'હોર્ન વગાડી આગળ વધો', 'ઝડપ વધારી પહેલાં નીકળી જાઓ', 'ઝીબ્રા ક્રોસિંગ પર રાહદારીઓનો પહેલો હક છે.'] }],
+  [null, { en: ['On a narrow hill road, which vehicle gets priority?', 'The vehicle going uphill', 'The vehicle going downhill', 'The bigger vehicle', 'The vehicle going downhill should stop and let the uphill vehicle pass.'],
+    gu: ['સાંકડા પહાડી રસ્તા પર કયા વાહનને પહેલાં જવા દેવું?', 'ચઢાણ ચઢતા વાહનને', 'ઢાળ ઊતરતા વાહનને', 'મોટા વાહનને', 'ઢાળ ઊતરતું વાહન રોકાઈને ચઢતા વાહનને જવા દે.'] }],
+  [null, { en: ['A car driven by a learner must show:', 'An "L" sign at the front and the back', 'An "L" sign only at the back', 'No sign', 'The red "L" plate warns others that a learner is driving.'],
+    gu: ['લર્નર ડ્રાઇવર ચલાવતી ગાડી પર શું હોવું જોઈએ?', 'આગળ અને પાછળ "L" ચિહ્ન', 'ફક્ત પાછળ "L" ચિહ્ન', 'કોઈ ચિહ્ન નહીં', 'લાલ "L" ચિહ્ન બીજાને જણાવે છે કે શીખનાર ગાડી ચલાવે છે.'] }],
+  [null, { en: ['When a learner drives a car, who must sit beside them?', 'A person with a valid driving licence', 'Nobody', 'Any adult', 'A licensed driver must sit beside the learner to guide them.'],
+    gu: ['લર્નર ગાડી ચલાવે ત્યારે બાજુમાં કોણ બેઠું હોવું જોઈએ?', 'માન્ય ડ્રાઇવિંગ લાઇસન્સ ધરાવતી વ્યક્તિ', 'કોઈ નહીં', 'કોઈ પણ પુખ્ત વ્યક્તિ', 'માર્ગદર્શન માટે લાઇસન્સ ધરાવતી વ્યક્તિ બાજુમાં હોવી જરૂરી છે.'] }],
+  [null, { en: ['How long is a learner\'s licence valid?', '6 months', '1 year', '5 years', 'Take the driving test within six months, or apply again.'],
+    gu: ['લર્નિંગ લાઇસન્સ કેટલા સમય માટે માન્ય રહે છે?', '6 મહિના', '1 વર્ષ', '5 વર્ષ', 'છ મહિનામાં ડ્રાઇવિંગ ટેસ્ટ આપી દો, નહીંતર ફરી અરજી કરવી પડે.'] }],
+  [null, { en: ['Which documents should you carry while driving?', 'Driving licence, RC, insurance and PUC certificate', 'Only an Aadhaar card', 'Only the RC', 'Paper or digital copies (for example in DigiLocker) are accepted.'],
+    gu: ['ગાડી ચલાવતી વખતે કયા દસ્તાવેજો સાથે રાખવા?', 'ડ્રાઇવિંગ લાઇસન્સ, આર.સી., વીમો અને PUC પ્રમાણપત્ર', 'ફક્ત આધાર કાર્ડ', 'ફક્ત આર.સી.', 'કાગળની કે ડિજિટલ નકલ (જેમ કે ડિજીલૉકરમાં) ચાલે.'] }],
+  [null, { en: ['Near a hospital or school, you should:', 'Not sound the horn and drive slowly', 'Sound the horn to warn people', 'Drive fast to pass quickly', 'These are silence zones.'],
+    gu: ['હૉસ્પિટલ કે શાળા પાસે તમારે:', 'હોર્ન ન વગાડવું અને ધીમે ચલાવવું', 'લોકોને ચેતવવા હોર્ન વગાડવું', 'જલ્દી નીકળી જવા ઝડપ વધારવી', 'આ શાંત વિસ્તાર (સાયલન્સ ઝોન) છે.'] }],
+  [null, { en: ['Holding a mobile phone and talking while driving is:', 'Not allowed', 'Allowed if you drive slowly', 'Allowed for short calls', 'Pull over safely if you must take a call.'],
+    gu: ['ગાડી ચલાવતી વખતે હાથમાં મોબાઇલ લઈ વાત કરવી:', 'મનાઈ છે', 'ધીમે ચલાવો તો ચાલે', 'ટૂંકી વાત હોય તો ચાલે', 'ફોન લેવો જ પડે તો ગાડી સલામત જગ્યાએ બાજુમાં રોકો.'] }],
+  [null, { en: ['Who should wear a seat belt in a car?', 'The driver and all passengers', 'Only the driver', 'Only on highways', 'Seat belts are for everyone in the car, front and back.'],
+    gu: ['ગાડીમાં સીટબેલ્ટ કોણે પહેરવો જોઈએ?', 'ડ્રાઇવર અને બધા મુસાફરોએ', 'ફક્ત ડ્રાઇવરે', 'ફક્ત હાઇવે પર', 'આગળ અને પાછળ બેઠેલા બધા માટે સીટબેલ્ટ છે.'] }],
+  [null, { en: ['Driving after drinking alcohol is:', 'An offence if blood alcohol is over 30 mg per 100 ml', 'Allowed if you feel fine', 'Allowed at night', 'Even small amounts slow your reactions. Do not drink and drive.'],
+    gu: ['દારૂ પીને ગાડી ચલાવવી:', 'લોહીમાં 100 મિલી દીઠ 30 મિગ્રાથી વધુ આલ્કોહોલ હોય તો ગુનો છે', 'સારું લાગે તો ચાલે', 'રાત્રે ચાલે', 'થોડો દારૂ પણ પ્રતિક્રિયા ધીમી કરે છે. પીને ગાડી ન ચલાવો.'] }],
+  [null, { en: ['At night a vehicle comes towards you. You should:', 'Dip your headlights (low beam)', 'Switch to high beam', 'Switch your lights off', 'High beam dazzles the other driver.'],
+    gu: ['રાત્રે સામેથી વાહન આવે ત્યારે:', 'હેડલાઇટ ડીમ કરો (લો બીમ)', 'હાઇ બીમ કરો', 'લાઇટ બંધ કરો', 'હાઇ બીમથી સામેના ડ્રાઇવરની આંખો અંજાઈ જાય છે.'] }],
+  [null, { en: ['In fog you should:', 'Drive slowly with low beam or fog lamps', 'Use high beam', 'Drive fast to get out of the fog', 'High beam reflects off fog and makes it harder to see.'],
+    gu: ['ધુમ્મસમાં તમારે:', 'લો બીમ કે ફૉગ લૅમ્પ ચાલુ રાખી ધીમે ચલાવવું', 'હાઇ બીમ ચાલુ કરવી', 'ધુમ્મસમાંથી જલ્દી નીકળવા ઝડપ વધારવી', 'હાઇ બીમ ધુમ્મસમાંથી પાછી ફેંકાય છે અને ઓછું દેખાય છે.'] }],
+  [null, { en: ['A continuous line runs along the centre of the road. You should:', 'Not cross it or overtake over it', 'Cross it freely', 'Park on it', 'A broken line may be crossed when safe; a continuous line may not.'],
+    gu: ['રસ્તાની વચ્ચે સળંગ (તૂટક નહીં) લીટી છે. તમારે:', 'તે ઓળંગવી નહીં અને ઓવરટેક ન કરવો', 'છૂટથી ઓળંગી શકાય', 'તેના પર પાર્ક કરી શકાય', 'તૂટક લીટી સલામત હોય ત્યારે ઓળંગી શકાય; સળંગ લીટી નહીં.'] }],
+  [null, { en: ['Where must you not park?', 'Near a junction, on a footpath or at a bus stop', 'In a marked parking area', 'In a parking lot off the road', 'Parking there blocks the view or the way of others.'],
+    gu: ['ક્યાં પાર્કિંગ ન કરી શકાય?', 'ચાર રસ્તા પાસે, ફૂટપાથ પર કે બસ સ્ટોપ પર', 'પાર્કિંગ માટે નિશાન કરેલી જગ્યામાં', 'રસ્તાની બહારના પાર્કિંગ લૉટમાં', 'ત્યાં પાર્ક કરવાથી બીજાને રસ્તો કે દૃશ્ય અટકે છે.'] }],
+  [null, { en: ['Someone is injured in an accident involving your vehicle. You must:', 'Get them medical help and inform the police within 24 hours', 'Leave the place quickly', 'Inform only the insurance company', 'Helping the injured comes first. Then report to the nearest police station.'],
+    gu: ['તમારા વાહનથી અકસ્માતમાં કોઈ ઘાયલ થાય તો:', 'તેમને સારવાર અપાવો અને 24 કલાકમાં પોલીસને જાણ કરો', 'ઝડપથી ત્યાંથી નીકળી જાઓ', 'ફક્ત વીમા કંપનીને જાણ કરો', 'પહેલાં ઘાયલની મદદ કરો. પછી નજીકના પોલીસ સ્ટેશને જાણ કરો.'] }],
+  [null, { en: ['A driver stretches the right arm out, palm down, and moves it up and down. This means:', 'I am slowing down', 'I am turning right', 'Please overtake me', 'Hand signals help when indicators are not visible.'],
+    gu: ['ડ્રાઇવર જમણો હાથ બહાર કાઢી, હથેળી નીચે રાખી ઉપર-નીચે કરે છે. તેનો અર્થ:', 'હું ધીમો પડું છું', 'હું જમણે વળું છું', 'મને ઓવરટેક કરો', 'ઇન્ડિકેટર ન દેખાય ત્યારે હાથના ઇશારા કામ આવે.'] }],
+  [null, { en: ['What is the minimum age for a private car licence?', '18 years', '16 years', '21 years', 'You can get a learner\'s licence for a car at 18.'],
+    gu: ['પ્રાઇવેટ કારના લાઇસન્સ માટે ઓછામાં ઓછી ઉંમર કેટલી?', '18 વર્ષ', '16 વર્ષ', '21 વર્ષ', 'કાર માટે લર્નિંગ લાઇસન્સ 18 વર્ષે મળે.'] }],
+  [null, { en: ['Before turning or changing lane, you should:', 'Check the mirrors, give the indicator, then turn', 'Turn first, then indicate', 'Only sound the horn', 'Mirror, signal, then move.'],
+    gu: ['વળતાં કે લેન બદલતાં પહેલાં:', 'અરીસામાં જુઓ, ઇન્ડિકેટર આપો, પછી વળો', 'પહેલાં વળો, પછી ઇન્ડિકેટર આપો', 'ફક્ત હોર્ન વગાડો', 'અરીસો, ઇન્ડિકેટર, પછી વળાંક.'] }],
+  [null, { en: ['How far behind the vehicle ahead should you drive?', 'Far enough to stop safely if it brakes suddenly', 'As close as possible', 'One car length at any speed', 'Leave more gap at higher speed and on wet roads.'],
+    gu: ['આગળના વાહનથી કેટલું અંતર રાખવું?', 'તે અચાનક બ્રેક મારે તો સલામત રીતે રોકાઈ શકો એટલું', 'શક્ય એટલું નજીક', 'કોઈ પણ ઝડપે એક ગાડી જેટલું', 'ઝડપ વધુ હોય કે રસ્તો ભીનો હોય ત્યારે વધુ અંતર રાખો.'] }]
+];
+
+const TXT = {
+  en: { brand: 'Soni Motor', sub: 'Training School · Karelibaug, Vadodara', title: 'Learner\'s licence practice test',
+    intro: `${ROUND} questions on road signs and rules, like the RTO test. Aim for ${TARGET} or more.`,
+    q: (i, n) => `Question ${i} of ${n}`, score: 'Score', next: 'Next question', finish: 'See result', right: 'Correct', wrong: 'Not quite',
+    answer: 'Answer', pass: 'Ready for the test', fail: 'Practise a bit more', passTxt: 'Good. Try a fresh set to make sure it was not luck.',
+    failTxt: `Read the answers below, then try a new set. Aim for ${TARGET} or more out of ${ROUND}.`, again: 'New set of questions', missed: 'Check these',
+    allRight: 'You answered every question correctly.', bookT: 'Learn to drive with Soni Motor', bookP: 'Car training with a patient instructor, from the first lesson to the RTO test.',
+    book: 'WhatsApp the school', bookMsg: 'Hello, I tried the learner licence practice test and would like to know about driving lessons.',
+    note: 'Practice questions written by the school from the rules of the road. The real test uses the RTO\'s own questions and pass mark.' },
+  gu: { brand: 'સોની મોટર', sub: 'ટ્રેનિંગ સ્કૂલ · કારેલીબાગ, વડોદરા', title: 'લર્નિંગ લાઇસન્સ પ્રેક્ટિસ ટેસ્ટ',
+    intro: `RTO ટેસ્ટ જેવા ${ROUND} પ્રશ્નો: ટ્રાફિક ચિહ્નો અને નિયમો. ${TARGET} કે વધુ સાચા લાવવાનો પ્રયત્ન કરો.`,
+    q: (i, n) => `પ્રશ્ન ${i} / ${n}`, score: 'સાચા', next: 'આગળનો પ્રશ્ન', finish: 'પરિણામ જુઓ', right: 'સાચું', wrong: 'ખોટું',
+    answer: 'સાચો જવાબ', pass: 'ટેસ્ટ માટે તૈયાર', fail: 'હજી થોડી પ્રેક્ટિસ કરો', passTxt: 'સરસ. નસીબ નહોતું તેની ખાતરી કરવા નવા પ્રશ્નો સાથે ફરી પ્રયત્ન કરો.',
+    failTxt: `નીચેના જવાબ વાંચો, પછી નવા પ્રશ્નો સાથે ફરી પ્રયત્ન કરો. ${ROUND}માંથી ${TARGET} કે વધુ સાચા લાવો.`, again: 'નવા પ્રશ્નો', missed: 'આ ફરી વાંચો',
+    allRight: 'તમે બધા પ્રશ્નોના સાચા જવાબ આપ્યા.', bookT: 'સોની મોટર સાથે ગાડી શીખો', bookP: 'પહેલા લેસનથી RTO ટેસ્ટ સુધી ધીરજવાન ટ્રેનર સાથે કાર ટ્રેનિંગ.',
+    book: 'સ્કૂલને વૉટ્સઍપ કરો', bookMsg: 'નમસ્તે, મેં લર્નિંગ લાઇસન્સની પ્રેક્ટિસ ટેસ્ટ આપી. મારે ડ્રાઇવિંગ ક્લાસ વિશે જાણવું છે.',
+    note: 'આ પ્રશ્નો સ્કૂલે ટ્રાફિક નિયમોમાંથી તૈયાર કર્યા છે. સાચી ટેસ્ટમાં RTOના પોતાના પ્રશ્નો અને પાસિંગ માર્ક હોય છે.' }
+};
+
+/* ===== state ===== */
+const store = { get(k, d) { try { const v = localStorage.getItem('llq.' + k); return v == null ? d : v; } catch (e) { return d; } }, set(k, v) { try { localStorage.setItem('llq.' + k, v); } catch (e) { } } };
+const S = { lang: store.get('lang', 'gu'), set: [], i: 0, answers: [] };
+const T = () => TXT[S.lang];
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const shuffle = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+
+function newSet() {
+  const signs = shuffle(BANK.filter(b => b[0])), rules = shuffle(BANK.filter(b => !b[0]));
+  const nSign = 6;
+  S.set = shuffle([...signs.slice(0, nSign), ...rules.slice(0, ROUND - nSign)]).map(b => ({ b, order: shuffle([1, 2, 3]) }));
+  S.i = 0; S.answers = [];
+}
+
+/* ===== render ===== */
+const root = document.getElementById('root');
+function header() {
+  const t = T();
+  return `<header class="top"><div class="lplate" aria-hidden="true">L</div><div class="brand"><b>${t.brand}</b><span>${t.sub}</span></div>
+    <div class="lang" role="group" aria-label="Language"><button type="button" id="lgGu" aria-pressed="${S.lang === 'gu'}">ગુજરાતી</button><button type="button" id="lgEn" aria-pressed="${S.lang === 'en'}">English</button></div></header>`;
+}
+function wireHeader() {
+  document.getElementById('lgGu').onclick = () => setLang('gu');
+  document.getElementById('lgEn').onclick = () => setLang('en');
+}
+function setLang(l) { S.lang = l; store.set('lang', l); document.documentElement.lang = l; render(); }
+function lane() {
+  return `<div class="lane" aria-hidden="true">${S.set.map((_, k) => { const a = S.answers[k]; return `<i class="${a == null ? (k === S.i ? 'cur' : '') : a.ok ? 'ok' : 'bad'}"></i>`; }).join('')}</div>`;
+}
+
+function render() {
+  document.documentElement.lang = S.lang;
+  if (S.i >= S.set.length) return renderResult();
+  const t = T(), item = S.set[S.i], [qt, ...opts] = item.b[1][S.lang], ans = S.answers[S.i];
+  const nRight = S.answers.filter(a => a && a.ok).length;
+  root.innerHTML = `${header()}
+    <div><h1>${t.title}</h1><p class="intro">${t.intro}</p></div>
+    ${lane()}
+    <div class="meta"><span>${t.q(S.i + 1, S.set.length)}</span><span>${t.score}: <b>${nRight}</b></span></div>
+    <section class="q" aria-live="polite">
+      ${item.b[0] ? `<div class="plate">${SIGNS[item.b[0]]}</div>` : ''}
+      <p class="qt">${esc(qt)}</p>
+      <div class="opts">${item.order.map((o, k) => {
+        let cls = '';
+        if (ans) cls = o === 1 ? 'right' : (o === ans.pick ? 'wrong' : 'dim');
+        return `<button type="button" class="opt ${cls}" data-o="${o}" ${ans ? 'disabled' : ''}><span class="k">${'ABC'[k]}</span><span>${esc(opts[o - 1])}</span></button>`;
+      }).join('')}</div>
+      ${ans ? `<div class="fb ${ans.ok ? 'ok' : 'bad'}"><b>${ans.ok ? '✓ ' + t.right : '✗ ' + t.wrong}</b><span>${esc(opts[3])}</span></div>
+      <button type="button" class="btn primary full" id="next">${S.i + 1 < S.set.length ? t.next : t.finish}</button>` : ''}
+    </section>
+    <p class="note">${t.note}</p>`;
+  wireHeader();
+  root.querySelectorAll('.opt:not([disabled])').forEach(b => b.onclick = () => { const o = +b.dataset.o; S.answers[S.i] = { pick: o, ok: o === 1 }; render(); const n = document.getElementById('next'); n && n.focus({ preventScroll: true }); n && n.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); });
+  const nx = document.getElementById('next'); if (nx) nx.onclick = () => { S.i++; render(); window.scrollTo({ top: 0 }); };
+}
+
+function renderResult() {
+  const t = T(), n = S.answers.filter(a => a.ok).length, pass = n >= TARGET;
+  const missed = S.set.map((it, k) => ({ it, a: S.answers[k] })).filter(x => !x.a.ok);
+  const wa = SCHOOL_PHONE ? `https://wa.me/91${SCHOOL_PHONE.replace(/\D/g, '').slice(-10)}?text=${encodeURIComponent(t.bookMsg)}` : '';
+  root.innerHTML = `${header()}
+    ${lane()}
+    <section class="score" aria-live="polite">
+      <div class="num">${n}<small>/${S.set.length}</small></div>
+      <div class="verdict ${pass ? 'ok' : 'bad'}">${pass ? t.pass : t.fail}</div>
+      <p>${pass ? t.passTxt : t.failTxt}</p>
+    </section>
+    <button type="button" class="btn primary full" id="again">${t.again}</button>
+    <section class="review"><h2>${missed.length ? t.missed : t.allRight}</h2>
+      ${missed.map(({ it }) => { const L = it.b[1][S.lang]; return `<div class="ritem">${it.b[0] ? SIGNS[it.b[0]] : ''}<div><div class="rq">${esc(L[0])}</div><div class="ra">${t.answer}: ${esc(L[1])}</div><div>${esc(L[4])}</div></div></div>`; }).join('')}
+    </section>
+    <section class="school"><h2>${t.bookT}</h2><p>${t.bookP}</p>
+      ${wa ? `<a class="btn wa full" href="${wa}" target="_blank" rel="noopener">${t.book}</a><p>WhatsApp: <span class="num2">+91 ${esc(SCHOOL_PHONE)}</span></p>` : `<p class="num2">Soni Motor Training School, Karelibaug, Vadodara</p>`}
+    </section>
+    <p class="note">${t.note}</p>`;
+  wireHeader();
+  document.getElementById('again').onclick = () => { newSet(); render(); window.scrollTo({ top: 0 }); };
+}
+
+newSet();
+render();
+</script>
+
+</body>
+</html>
