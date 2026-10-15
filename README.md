@@ -1,13 +1,13 @@
 # Soni Motor
 
-Phone app for Soni Motor Training School, Karelibaug, Vadodara: enquiries, students, one-tap lesson log, payments, progress cards, Google review requests and a weekly report. Gujarati and English.
+Phone app for Soni Motor Training School, Karelibaug, Vadodara: enquiries, students, one-tap lesson log, payments, progress cards, a per-car timetable (book, block, print), Google review requests and a weekly report. Gujarati and English.
 
 - **App:** <https://vnsr.github.io/soni-motor/> (installable PWA, Android and iPhone). Add `?demo` to try it with made-up data.
 - **Learner's licence practice quiz (public):** <https://vnsr.github.io/soni-motor/quiz/>
 
 ## Where the data lives
 
-Nowhere in this repo. All records are in the school's Google Sheet, reached through the Apps Script in [`apps-script/Code.gs`](apps-script/Code.gs). Every request needs the school PIN, which is stored only in the Sheet.
+Nowhere in this repo. All records are in the school's Google Sheet, reached through the Apps Script in [`apps-script/Code.gs`](apps-script/Code.gs). Every request needs a personal PIN; PINs are stored only in the Sheet, and each entry is stamped with the PIN owner's name.
 
 ## Files
 

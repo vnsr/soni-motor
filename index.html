@@ -101,8 +101,8 @@ h2 .count{font-size:13px;background:var(--sunk);color:var(--muted);border-radius
 .chip{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:6px 12px;font-size:14px;cursor:pointer}
 .chip[aria-pressed="true"]{background:var(--fg);color:var(--bg);border-color:var(--fg)}
 
-nav.tabs{position:relative;z-index:5;background:var(--surface);border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(4,1fr);padding:4px 4px calc(env(safe-area-inset-bottom,0px) + 4px)}
-nav.tabs button{border:0;background:none;padding:6px 2px;display:flex;flex-direction:column;align-items:center;gap:1px;font-size:12.5px;color:var(--muted);cursor:pointer}
+nav.tabs{position:relative;z-index:5;background:var(--surface);border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(5,1fr);padding:4px 4px calc(env(safe-area-inset-bottom,0px) + 4px)}
+nav.tabs button{border:0;background:none;padding:6px 2px;display:flex;flex-direction:column;align-items:center;gap:1px;font-size:11.5px;color:var(--muted);cursor:pointer;min-width:0}
 nav.tabs svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8}
 nav.tabs button[aria-current="page"]{color:var(--accent);font-weight:600}
 
@@ -164,6 +164,49 @@ svg.bars .g{stroke:var(--line)}
 .warn b{display:block;margin-bottom:2px}
 .warn ul{margin:4px 0 0;padding-left:18px}
 .ver{color:var(--muted);font-size:12.5px;text-align:center}
+/* v1.3: timetable */
+.ttbar{display:flex;align-items:center;gap:8px}
+.ttdate{flex:1;position:relative;display:flex;justify-content:center;text-align:center;border:1px solid var(--line);border-radius:var(--r);background:var(--surface);padding:6px 10px;cursor:pointer}
+.ttdate b{display:block;font-size:17px;line-height:1.2}
+.ttdate small{color:var(--muted);font-size:13px}
+.ttdate input{position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:pointer}
+.btns .sp{flex:1}
+.selbar{position:sticky;top:0;z-index:2;display:flex;align-items:center;gap:8px;flex-wrap:wrap;background:var(--surface);border:1px solid var(--accent);border-radius:var(--r);padding:8px 10px}
+.selbar .sp{flex:1}
+.slot{display:flex;align-items:center;gap:14px;width:100%;text-align:left;border:0;border-top:1px solid var(--line);background:var(--surface);padding:8px 14px;min-height:50px;cursor:pointer}
+.slot:first-child{border-top:0}
+.slot .tm{width:50px;flex:none;font-weight:700;font-variant-numeric:tabular-nums}
+.slot .who{flex:1;min-width:0;display:flex;flex-direction:column;line-height:1.25;overflow:hidden;text-overflow:ellipsis}
+.slot .who small{color:var(--muted);font-size:12.5px}
+.slot .mute{color:var(--muted)}
+.slot.bkd{box-shadow:inset 4px 0 0 var(--ok)}
+.slot.blk{background:repeating-linear-gradient(135deg,var(--surface) 0 9px,var(--sunk) 9px 18px);color:var(--muted)}
+.slot.past{opacity:.55}
+.slot.sel{background:var(--accent-soft);box-shadow:inset 4px 0 0 var(--accent)}
+.who{font-weight:600}
+.f .who{padding:4px 0}
+#print{display:none}
+@media print{
+  html,body{height:auto!important;overflow:visible!important;background:#fff!important;color:#000!important}
+  #app,#toast,#busy,.scrim{display:none!important}
+  #print{display:block!important;font:10pt/1.3 var(--font);color:#000}
+  #print h1{font-size:15pt;margin:0}
+  #print h2{font-size:11pt;margin:2px 0 8px;font-weight:600}
+  #print table{width:100%;border-collapse:collapse;table-layout:fixed}
+  #print th,#print td{border:1px solid #888;padding:3px 5px;text-align:left;vertical-align:top;overflow:hidden}
+  #print th{background:#eee}
+  #print .pday td{height:8.1mm}
+  #print .pday th:first-child{width:27mm}
+  #print .pday td:first-child{white-space:nowrap}
+  #print .pday th:nth-child(3){width:28mm}
+  #print .pday th:last-child{width:14mm}
+  #print .pweek{font-size:8.5pt}
+  #print .pweek td{height:6mm;white-space:nowrap;text-overflow:ellipsis}
+  #print .pweek th:first-child{width:14mm}
+  #print td.k,#print tr.k td{background:#e6e6e6;color:#444}
+  #print .pfoot{font-size:8pt;color:#555;margin-top:6px}
+}
+
 </style>
 
 </head>
@@ -171,6 +214,7 @@ svg.bars .g{stroke:var(--line)}
 <div id="busy" class="busy" hidden></div>
 <div id="app"></div>
 <div id="toast" class="toast" role="status" hidden></div>
+<div id="print" aria-hidden="true"></div>
 
 <script>
 /* ================= text ================= */
@@ -199,9 +243,9 @@ const I18N = {
     plus1: '+1', lessonSaved: (n, l, t) => `${n}: lesson ${l}${t ? ' of ' + t : ''} saved`,
     markDone: 'Mark complete', reviewAsk: 'Ask for review', reviewGot: 'Review received', reviewAsked: 'Review asked',
     history: 'Lessons', payments: 'Payments', addLesson: '+1 lesson', addPay: 'Add payment',
-    pinTitle: 'Enter the school PIN', pinHint: 'Ask the school for the PIN. You enter it once on this phone.', pinGo: 'Open', pinBad: 'Wrong PIN. Try again.',
+    pinTitle: 'Enter your PIN', pinHint: 'Everyone has their own PIN. Ask the admin if you don\'t have one yet. You enter it once on this phone.', pinGo: 'Open', pinBad: 'Wrong PIN. Try again.',
     whoTitle: 'Who is using this phone?', whoHint: 'Your name is saved next to every entry you make.', other: 'Other name',
-    settings: 'Settings', you: 'You are', language: 'Language', logout: 'Forget PIN on this phone', defaultTrainer: 'Usual trainer',
+    settings: 'Settings', you: 'You are', language: 'Language', logout: 'Log out on this phone', defaultTrainer: 'Usual trainer',
     thisWeek: 'This week', lastWeek: 'vs last week', newStudents: 'New students', paymentsIn: 'Payments received', conv: 'Enquiries that joined', conv4: 'last 4 weeks',
     activeNow: 'Learning now', outstanding: 'Money still to collect', reviews: 'Reviews', reviewsTxt: (a, b) => `${a} asked · ${b} received`,
     lessons8: 'Lessons per week', lessonsK: 'Lessons', sources8: 'Where enquiries came from, last 8 weeks',
@@ -216,6 +260,15 @@ const I18N = {
     askedInPerson: 'Asked in person', noReviewLink: 'The review link is missing. The admin adds it in the Settings tab of the sheet.',
     sendQuiz: 'Send practice quiz', setupTitle: 'Setup not finished', setupHint: 'The admin fills these in the sheet.',
     setupPrice: n => `${n}: price missing`, setupCar: n => `${n}: car name missing`, setupReview: 'Google review link missing', version: 'App version',
+    timetable: 'Timetable', free: 'Free', blocked: 'Blocked', bookStudent: 'Book a student', chooseStudent: 'Choose a student',
+    blockSlot: 'Block this time', reason: 'Reason (optional)', reasonPh: 'e.g. car service, holiday', repeat7: 'Same time for the next 6 days too',
+    makeFree: 'Make free again', cancelBooking: 'Cancel booking', lessonDone: 'Lesson done (+1)', remind: 'Send reminder',
+    select: 'Select', selN: n => `${n} selected`, blockSel: 'Block', freeSel: 'Make free', selDone: 'Done',
+    printDay: 'Print day', printWeek: 'Print week', printHint: 'In the print screen, choose "Save as PDF" to get a file.',
+    noCars: 'No cars yet. Add them in the Packages tab of the sheet.', slotsSummary: (b, k, f) => `${b} booked · ${k} blocked · ${f} free`,
+    taken: 'Someone just changed one of these slots. The timetable is refreshed; please check and try again.',
+    bookedBy: 'Booked by', todayBookings: "Today's timetable", nextBooking: 'Next lesson', time: 'Time', tick: 'Done', printedOn: 'Printed',
+    remindMsg: (n, d, tm, car) => `Hello ${n}, a reminder from Soni Motor Training School: your driving lesson is on ${d} at ${tm} (${car}). See you then!`,
     skill: {
       controls: 'Seat, mirrors, seat belt, controls', moveoff: 'Starting, moving off, stopping', clutch: 'Clutch control and gear changes',
       steering: 'Steering and keeping in lane', turns: 'Left and right turns with indicator', signals: 'Signals, signs, right of way',
@@ -247,9 +300,9 @@ const I18N = {
     plus1: '+1', lessonSaved: (n, l, t) => `${n}: લેસન ${l}${t ? '/' + t : ''} નોંધાયો`,
     markDone: 'પૂર્ણ કરો', reviewAsk: 'રિવ્યૂ માટે પૂછો', reviewGot: 'રિવ્યૂ મળ્યો', reviewAsked: 'રિવ્યૂ માંગ્યો',
     history: 'લેસન', payments: 'ચુકવણી', addLesson: '+1 લેસન', addPay: 'ચુકવણી ઉમેરો',
-    pinTitle: 'સ્કૂલનો પિન નાખો', pinHint: 'પિન સ્કૂલ પાસેથી લો. આ ફોન પર એક જ વાર નાખવાનો છે.', pinGo: 'ખોલો', pinBad: 'ખોટો પિન. ફરી પ્રયત્ન કરો.',
+    pinTitle: 'તમારો પિન નાખો', pinHint: 'દરેક વ્યક્તિનો પોતાનો પિન છે. ન હોય તો ઍડમિન પાસેથી લો. આ ફોન પર એક જ વાર નાખવાનો છે.', pinGo: 'ખોલો', pinBad: 'ખોટો પિન. ફરી પ્રયત્ન કરો.',
     whoTitle: 'આ ફોન કોણ વાપરે છે?', whoHint: 'તમે જે નોંધશો તેની સાથે તમારું નામ સચવાશે.', other: 'બીજું નામ',
-    settings: 'સેટિંગ્સ', you: 'તમે', language: 'ભાષા', logout: 'આ ફોન પરથી પિન ભૂલી જાઓ', defaultTrainer: 'સામાન્ય ટ્રેનર',
+    settings: 'સેટિંગ્સ', you: 'તમે', language: 'ભાષા', logout: 'આ ફોન પરથી લૉગ આઉટ કરો', defaultTrainer: 'સામાન્ય ટ્રેનર',
     thisWeek: 'આ અઠવાડિયું', lastWeek: 'ગયા અઠવાડિયા કરતાં', newStudents: 'નવા વિદ્યાર્થીઓ', paymentsIn: 'મળેલી ચુકવણી', conv: 'પૂછપરછમાંથી જોડાયા', conv4: 'છેલ્લા 4 અઠવાડિયા',
     activeNow: 'હાલ શીખે છે', outstanding: 'હજી લેવાના બાકી', reviews: 'રિવ્યૂ', reviewsTxt: (a, b) => `${a} માંગ્યા · ${b} મળ્યા`,
     lessons8: 'અઠવાડિયા દીઠ લેસન', lessonsK: 'લેસન', sources8: 'પૂછપરછ ક્યાંથી આવી, છેલ્લા 8 અઠવાડિયા',
@@ -264,6 +317,15 @@ const I18N = {
     askedInPerson: 'રૂબરૂ પૂછ્યું', noReviewLink: 'રિવ્યૂ લિંક હજી નથી. ઍડમિન શીટના Settings ટૅબમાં ઉમેરશે.',
     sendQuiz: 'પ્રેક્ટિસ ક્વિઝ મોકલો', setupTitle: 'સેટઅપ હજી બાકી છે', setupHint: 'આ ઍડમિન શીટમાં ભરશે.',
     setupPrice: n => `${n}: કિંમત બાકી`, setupCar: n => `${n}: ગાડીનું નામ બાકી`, setupReview: 'ગૂગલ રિવ્યૂ લિંક બાકી', version: 'ઍપ વર્ઝન',
+    timetable: 'સમયપત્રક', free: 'ખાલી', blocked: 'બંધ', bookStudent: 'વિદ્યાર્થી બુક કરો', chooseStudent: 'વિદ્યાર્થી પસંદ કરો',
+    blockSlot: 'આ સમય બંધ કરો', reason: 'કારણ (ઇચ્છા હોય તો)', reasonPh: 'દા.ત. ગાડીની સર્વિસ, રજા', repeat7: 'આવતા 6 દિવસ પણ આ જ સમયે',
+    makeFree: 'ફરી ખાલી કરો', cancelBooking: 'બુકિંગ રદ કરો', lessonDone: 'લેસન થઈ ગયો (+1)', remind: 'યાદ અપાવો',
+    select: 'પસંદ કરો', selN: n => `${n} પસંદ કર્યા`, blockSel: 'બંધ કરો', freeSel: 'ખાલી કરો', selDone: 'પૂરું',
+    printDay: 'દિવસ છાપો', printWeek: 'અઠવાડિયું છાપો', printHint: 'ફાઇલ જોઈતી હોય તો પ્રિન્ટ સ્ક્રીનમાં "Save as PDF" પસંદ કરો.',
+    noCars: 'હજી ગાડીઓ નથી. શીટના Packages ટૅબમાં ઉમેરો.', slotsSummary: (b, k, f) => `${b} બુક · ${k} બંધ · ${f} ખાલી`,
+    taken: 'આમાંનો કોઈ સ્લૉટ હમણાં બીજા કોઈએ બદલ્યો. સમયપત્રક તાજું કર્યું; જોઈને ફરી પ્રયત્ન કરો.',
+    bookedBy: 'બુક કરનાર', todayBookings: 'આજનું સમયપત્રક', nextBooking: 'આગળનો લેસન', time: 'સમય', tick: 'થયું', printedOn: 'છાપ્યું',
+    remindMsg: (n, d, tm, car) => `નમસ્તે ${n}, સોની મોટર ટ્રેનિંગ સ્કૂલ તરફથી યાદ અપાવીએ છીએ: તમારો ડ્રાઇવિંગ લેસન ${d}ના રોજ ${tm} વાગ્યે છે (${car}). મળીએ!`,
     skill: {
       controls: 'સીટ, અરીસા, સીટબેલ્ટ અને કંટ્રોલ', moveoff: 'ગાડી ચાલુ કરવી, ઉપાડવી અને રોકવી', clutch: 'ક્લચ કંટ્રોલ અને ગિયર બદલવા',
       steering: 'સ્ટિયરિંગ અને લેનમાં રહેવું', turns: 'ઇન્ડિકેટર આપી ડાબે-જમણે વળવું', signals: 'સિગ્નલ, ટ્રાફિક ચિહ્નો અને રસ્તાનો હક',
@@ -276,7 +338,7 @@ const SOURCES = ['Walk-in', 'Phone', 'WhatsApp', 'Google', 'Referral', 'Other'];
 const MODES = ['Cash', 'UPI', 'Card'];
 const LICS = ['None', 'Learner', 'Permanent'];
 const SKILLS = ['controls', 'moveoff', 'clutch', 'steering', 'turns', 'signals', 'traffic', 'reverse', 'parking', 'slope', 'rto'];
-const APP_VERSION = '1.2.1';
+const APP_VERSION = '1.3.0';
 
 /* ================= storage ================= */
 const ls = {
@@ -328,22 +390,30 @@ function call(action, payload) {
   payload = Object.assign({ LoggedBy: st.me }, payload || {});
   $('#busy').hidden = false;
   const done = r => { $('#busy').hidden = true; return r; };
-  if (!IS_LIVE) return new Promise(res => setTimeout(() => res(done(Mock.api(st.pin, action, payload))), 180)).catch(e => { done(); throw e; });
+  if (!IS_LIVE) return new Promise((res, rej) => setTimeout(() => { try { res(done(Mock.api(st.pin, action, payload))); } catch (e) { done(); e.server = true; rej(e); } }, 180));
   /* text/plain keeps this a simple request: no CORS preflight, which Apps Script cannot answer */
   return fetch(API_URL, { method: 'POST', body: JSON.stringify({ pin: st.pin, action, payload }), headers: { 'Content-Type': 'text/plain;charset=utf-8' }, redirect: 'follow' })
     .then(r => r.json())
     .then(r => { done(); if (!r.ok) { const e = new Error(r.error || 'error'); e.server = true; throw e; } if (r.db) { st.offline = false; ls.set('db', r.db); } return r; })
     .catch(e => { done(); if (!e.server) e.net = true; throw e; });
 }
+function adopt(db) {
+  st.db = db;
+  if (db && db.me) {
+    st.me = db.me; ls.set('me', db.me);
+    if (!st.trainer || !(db.staff || []).includes(st.trainer)) { st.trainer = (db.staff || []).includes(db.me) ? db.me : ((db.staff || [])[0] || db.me); ls.set('trainer', st.trainer); }
+  }
+}
 async function act(action, payload, okMsg) {
   try {
     const r = await call(action, payload);
-    st.db = r.db; render();
+    adopt(r.db); render();
     if (okMsg) toast(typeof okMsg === 'function' ? okMsg(r.result) : okMsg);
     return r.result;
   } catch (e) {
     const m = String(e && e.message || e);
     if (m === 'PIN') { ls.del('pin'); st.pin = ''; st.pinBad = true; st.db = null; render(); return null; }
+    if (m === 'TAKEN') { toast(T().taken); try { const r = await call('load'); adopt(r.db); render(); } catch (x) { } throw e; }
     toast(m === 'LOCKED' ? T().locked : T().offline); throw e;
   }
 }
@@ -367,6 +437,7 @@ const ICONS = {
   students: '<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.6 3.4-5.5 6.5-5.5s5.7 1.9 6.5 5.5"/><circle cx="17" cy="9" r="2.5"/><path d="M16 14.6c2.6.1 4.6 1.8 5.4 4.9"/>',
   enquiries: '<path d="M4 5h16v11H9l-5 4z"/><path d="M8 9h8M8 12h5"/>',
   report: '<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>',
+  timetable: '<rect x="3.5" y="5" width="17" height="15.5" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4M8 14h2M14 14h2M8 17h2"/>',
   gear: '<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.6 1.6 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.6 1.6 0 0 0-1.8-.3 1.6 1.6 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.6 1.6 0 0 0-1-1.5 1.6 1.6 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.6 1.6 0 0 0 .3-1.8 1.6 1.6 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.6 1.6 0 0 0 1.5-1 1.6 1.6 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.6 1.6 0 0 0 1.8.3H9a1.6 1.6 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.6 1.6 0 0 0 1 1.5 1.6 1.6 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.6 1.6 0 0 0-.3 1.8V9a1.6 1.6 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.6 1.6 0 0 0-1.5 1z"/>'
 };
 const ico = k => `<svg viewBox="0 0 24 24" aria-hidden="true">${ICONS[k]}</svg>`;
@@ -391,22 +462,22 @@ function render() {
     </header>
     ${IS_LIVE ? (st.offline ? `<div class="demo">${t.offlineBanner}</div>` : '') : `<div class="demo">${t.demo}</div>`}
     <div class="scroller" id="scroller"><main id="main"></main></div>
-    <nav class="tabs">${['home', 'students', 'enquiries', 'report'].map(k => `<button type="button" data-tab="${k}" ${st.tab === k ? 'aria-current="page"' : ''}>${ico(k)}${t[k]}</button>`).join('')}</nav>`;
+    <nav class="tabs">${['home', 'students', 'timetable', 'enquiries', 'report'].map(k => `<button type="button" data-tab="${k}" ${st.tab === k ? 'aria-current="page"' : ''}>${ico(k)}${t[k]}</button>`).join('')}</nav>`;
   app.querySelectorAll('[data-lang]').forEach(b => b.onclick = () => { st.lang = b.dataset.lang; ls.set('lang', st.lang); render(); });
   app.querySelectorAll('[data-tab]').forEach(b => b.onclick = () => { st.tab = b.dataset.tab; st.q = ''; st.keepScroll = false; render(); });
   $('#gear').onclick = openSettings;
-  ({ home: renderHome, students: renderStudents, enquiries: renderEnquiries, report: renderReport })[st.tab]($('#main'));
+  ({ home: renderHome, students: renderStudents, timetable: renderTimetable, enquiries: renderEnquiries, report: renderReport })[st.tab]($('#main'));
   $('#scroller').scrollTop = keepY;
   st.keepScroll = true;
 }
 
 async function load() {
-  try { const r = await call('load'); st.db = r.db; render(); }
+  try { const r = await call('load'); adopt(r.db); render(); }
   catch (e) {
     const m = String(e && e.message || e), cached = ls.get('db', null);
     if (m === 'PIN') { ls.del('pin'); st.pin = ''; st.pinBad = true; render(); return; }
     if (m === 'LOCKED') { st.pin = ''; st.locked = true; render(); return; }
-    if (e.net && cached) { st.db = cached; st.offline = true; render(); return; }
+    if (e.net && cached) { adopt(cached); st.offline = true; render(); return; }
     $('#app').innerHTML = `<div class="gate"><div class="lplate">L</div><p class="err">${T().offline}</p><button class="btn primary big" onclick="load()">↻</button></div>`;
   }
 }
@@ -419,7 +490,7 @@ function renderPin(app) {
     <button class="btn primary big" type="submit">${t.pinGo}</button>
     <div class="lang" style="align-self:center"><button type="button" data-lang="gu" aria-pressed="${st.lang === 'gu'}">ગુજરાતી</button><button type="button" data-lang="en" aria-pressed="${st.lang === 'en'}">English</button></div></form>`;
   app.querySelectorAll('[data-lang]').forEach(b => b.onclick = () => { st.lang = b.dataset.lang; ls.set('lang', st.lang); render(); });
-  $('#pinf').onsubmit = e => { e.preventDefault(); st.pin = $('#pin').value.trim(); st.pinBad = false; st.locked = false; ls.set('pin', st.pin); st.db = null; render(); };
+  $('#pinf').onsubmit = e => { e.preventDefault(); st.pin = $('#pin').value.trim(); st.pinBad = false; st.locked = false; ls.set('pin', st.pin); ls.del('me'); st.me = ''; st.db = null; render(); };
   setTimeout(() => $('#pin') && $('#pin').focus(), 50);
 }
 function renderWho(app) {
@@ -458,9 +529,12 @@ function renderHome(m) {
       <button class="act" id="aStu"><b>${t.newStudent}</b><small>${t.newStudentSub}</small></button>
       <button class="act" id="aPay" style="grid-column:1/-1"><b>${t.payment}</b><small>${t.paymentSub}</small></button>
     </div>
+    ${(() => { const tb = (st.db.bookings || []).filter(b => b.Date === td && b.Type === 'Booked').sort((a, b) => a.Slot.localeCompare(b.Slot));
+      return tb.length ? `<section><h2>${t.todayBookings} <span class="count">${n2(tb.length)}</span></h2><div class="card">${tb.map(b => { const s = stuById(b.StudentID); return `<div class="row tap" data-tt="${esc(b.Car)}"><span class="tm" style="font-weight:700;font-variant-numeric:tabular-nums;width:50px">${b.Slot}</span><div class="main"><div class="t">${esc(s ? s.Name : b.StudentID)}</div><div class="m">${esc(b.Car)}${b.Note ? ' · ' + esc(b.Note) : ''}</div></div></div>`; }).join('')}</div></section>` : ''; })()}
     <section><h2>${t.lessonsToday} <span class="count">${n2(todays.length)}</span></h2>
       <div class="card">${todays.length ? todays.map(l => { const s = byId[l.StudentID] || {}; return `<div class="row tap" data-stu="${l.StudentID}"><div class="main"><div class="t">${esc(s.Name || l.StudentID)}</div><div class="m">${t.lesson} ${n2(l.LessonNo)}${s.tot ? '/' + n2(s.tot) : ''} · ${esc(l.Instructor || '')}${l.LoggedBy && l.LoggedBy !== l.Instructor ? ' · ' + esc(l.LoggedBy) : ''}</div></div></div>`; }).join('') : `<div class="empty">${t.none}</div>`}</div></section>
     <section><h2>${t.todo} <span class="count">${n2(todo.length)}</span></h2><div class="card">${todo.join('') || `<div class="empty">${t.none}</div>`}</div></section>`;
+  m.querySelectorAll('[data-tt]').forEach(r => r.onclick = () => { st.tab = 'timetable'; st.ttCar = r.dataset.tt; st.ttDate = td; st.keepScroll = false; render(); });
   $('#aLesson').onclick = openLessonPicker; $('#aEnq').onclick = () => openEnquiryForm(); $('#aStu').onclick = () => openStudentForm(); $('#aPay').onclick = () => openPaymentForm();
   wireCommon(m);
 }
@@ -544,6 +618,7 @@ function openStudent(id) {
       <dt>${t.paid}</dt><dd>${inr(s.paid)} / ${inr(s.Price || 0)}</dd>
       <dt>${t.balance}</dt><dd>${s.bal > 0 ? `<span class="badge due">${inr(s.bal)}</span>` : `<span class="badge ok">${t.clear}</span>`}</dd>
       <dt>${t.instructor}</dt><dd>${esc(s.Instructor || '–')}</dd>
+      ${(() => { const nb = (st.db.bookings || []).filter(b => b.StudentID === s.ID && b.Type === 'Booked' && b.Date >= today()).sort((a, b) => (a.Date + a.Slot).localeCompare(b.Date + b.Slot))[0]; return nb ? `<dt>${t.nextBooking}</dt><dd>${fd(nb.Date, true)} · ${nb.Slot} · ${esc(nb.Car)}</dd>` : ''; })()}
       <dt>${t.joinedOn}</dt><dd>${fd(s.JoinDate)}</dd>
       <dt>${t.status}</dt><dd>${esc(t.sst[s.Status] || s.Status)}</dd>
     </dl>
@@ -767,19 +842,158 @@ function renderReport(m) {
     <section><h2>${t.sources8}</h2><div class="card">${src.map(([k, v]) => `<div class="row"><div class="main"><div class="t">${t.src[k]}</div><div class="prog"><i style="width:${v / smx * 100}%"></i></div></div><b>${n2(v)}</b></div>`).join('') || `<div class="empty">${t.none}</div>`}</div></section>`;
 }
 
+/* ================= timetable ================= */
+function carList() {
+  const set = (st.db.settings || {}).Cars;
+  const list = set ? String(set).split(',').map(x => x.trim()) : (st.db.packages || []).map(p => String(p.Car || '').trim());
+  return [...new Set(list.filter(c => c && !/EDIT/i.test(c)))];
+}
+function hm(m) { return String(Math.floor(m / 60)).padStart(2, '0') + ':' + String(m % 60).padStart(2, '0'); }
+function toMin(x, d) { const m = /^(\d{1,2}):(\d{2})$/.exec(String(x || '').trim()); return m ? +m[1] * 60 + +m[2] : d; }
+function slotList() {
+  const s = st.db.settings || {}, a = toMin(s.SlotStart, 390), b = toMin(s.SlotEnd, 1200), step = Math.max(10, Number(s.SlotMinutes) || 30), out = [];
+  for (let m = a; m + step <= b; m += step) out.push(hm(m));
+  return out;
+}
+function slotEnd(sl) { return hm(toMin(sl, 0) + Math.max(10, Number((st.db.settings || {}).SlotMinutes) || 30)); }
+function bookingsOn(date, car) {
+  const o = {}; (st.db.bookings || []).forEach(b => { if (b.Date === date && (!car || b.Car === car)) o[car ? b.Slot : b.Car + '|' + b.Slot] = b; });
+  return o;
+}
+function stuById(id) { return studentsX().find(s => s.ID === id); }
+function firstName(n) { return String(n || '').split(' ')[0]; }
+
+function renderTimetable(m) {
+  const t = T(), cars = carList();
+  if (!cars.length) { m.innerHTML = `<h1>${t.timetable}</h1><div class="card"><div class="empty">${t.noCars}</div></div>`; return; }
+  if (!cars.includes(st.ttCar)) st.ttCar = cars[0];
+  st.ttDate = st.ttDate || today();
+  const car = st.ttCar, d = st.ttDate, B = bookingsOn(d, car), slots = slotList(), sel = st.ttSel;
+  const nowMin = d === today() ? toMin(new Date(Date.now() + 5.5 * 3600e3).toISOString().slice(11, 16), 0) : (d < today() ? 1e9 : -1);
+  const nB = slots.filter(x => B[x] && B[x].Type === 'Booked').length, nK = slots.filter(x => B[x] && B[x].Type === 'Blocked').length;
+  m.innerHTML = `
+    <div class="ttbar">
+      <button class="iconbtn" id="ttPrev" aria-label="‹">‹</button>
+      <label class="ttdate"><span><b>${fd(d, true)}</b><small>${rel(d)}</small></span><input type="date" id="ttD" value="${d}" aria-label="${t.date}"></label>
+      <button class="iconbtn" id="ttNext" aria-label="›">›</button>
+    </div>
+    <div class="chips" role="group" aria-label="${t.car}">${cars.map(c => `<button class="chip" data-car="${esc(c)}" aria-pressed="${c === car}">${esc(c)}</button>`).join('')}</div>
+    ${sel ? `<div class="selbar"><b>${t.selN(n2(sel.size))}</b><span class="sp"></span>
+        <button class="btn" id="selBlock" ${sel.size ? '' : 'disabled'}>${t.blockSel}</button>
+        <button class="btn" id="selFree" ${sel.size ? '' : 'disabled'}>${t.freeSel}</button>
+        <button class="btn primary" id="selDone">${t.selDone}</button></div>`
+      : `<div class="btns"><button class="btn" id="ttSel">${t.select}</button><span class="sp"></span><button class="btn" id="ttPD">${t.printDay}</button><button class="btn" id="ttPW">${t.printWeek}</button></div>`}
+    <p class="sub">${t.slotsSummary(n2(nB), n2(nK), n2(slots.length - nB - nK))}</p>
+    <div class="card" id="ttList">${slots.map(x => {
+      const b = B[x], past = toMin(x, 0) + 30 <= nowMin, s = b && b.Type === 'Booked' ? stuById(b.StudentID) : null;
+      const cls = (b ? (b.Type === 'Blocked' ? 'blk' : 'bkd') : 'free') + (past ? ' past' : '') + (sel && sel.has(x) ? ' sel' : '');
+      const body = !b ? `<span class="who mute">${t.free}</span>`
+        : b.Type === 'Blocked' ? `<span class="who">${t.blocked}${b.Note ? ' · ' + esc(b.Note) : ''}</span>`
+        : `<span class="who"><b>${esc(s ? s.Name : b.StudentID)}</b>${s && s.tot ? `<small>${t.lesson} ${n2(Math.min(s.done + 1, s.tot))}/${n2(s.tot)}</small>` : ''}</span>`;
+      return `<button type="button" class="slot ${cls}" data-slot="${x}" ${sel ? `aria-pressed="${sel.has(x)}"` : ''}><span class="tm">${x}</span>${body}</button>`;
+    }).join('')}</div>`;
+  const go = n => { st.ttDate = addDays(d, n); st.keepScroll = false; render(); };
+  $('#ttPrev').onclick = () => go(-1); $('#ttNext').onclick = () => go(1);
+  $('#ttD').onchange = e => { if (e.target.value) { st.ttDate = e.target.value; st.keepScroll = false; render(); } };
+  m.querySelectorAll('[data-car]').forEach(b => b.onclick = () => { st.ttCar = b.dataset.car; st.ttSel = null; render(); });
+  m.querySelectorAll('[data-slot]').forEach(b => b.onclick = () => {
+    const x = b.dataset.slot;
+    if (st.ttSel) { st.ttSel.has(x) ? st.ttSel.delete(x) : st.ttSel.add(x); render(); }
+    else openSlot(car, d, x);
+  });
+  if (sel) {
+    $('#selDone').onclick = () => { st.ttSel = null; render(); };
+    $('#selBlock').onclick = () => openBlock(car, d, [...sel].sort());
+    $('#selFree').onclick = async () => { const L = [...sel]; st.ttSel = null; await act('clearSlots', { Car: car, Date: d, Slots: L }, t.saved); };
+  } else {
+    $('#ttSel').onclick = () => { st.ttSel = new Set(); render(); };
+    $('#ttPD').onclick = () => printTT('day'); $('#ttPW').onclick = () => printTT('week');
+  }
+}
+
+function openSlot(car, d, x) {
+  const t = T(), b = bookingsOn(d, car)[x], title = `${car} · ${x}–${slotEnd(x)} · ${fd(d)}`;
+  if (!b) {
+    const S = studentsX().filter(s => s.Status === 'Active').sort((a, c) => a.Name.localeCompare(c.Name));
+    sheet(title, `<form id="fB" style="display:flex;flex-direction:column;gap:12px">
+        <div class="f"><label for="bS">${t.bookStudent}</label><select id="bS" required><option value="">${t.chooseStudent}</option>${S.map(s => `<option value="${s.ID}">${esc(s.Name)}${s.tot ? ' · ' + n2(s.done) + '/' + n2(s.tot) : ''}</option>`).join('')}</select></div>
+        <div class="f"><label for="bN">${t.note}</label><input id="bN" maxlength="80" autocomplete="off"></div>
+        <button class="btn primary big" type="submit">${t.bookStudent}</button></form>
+      <button class="btn big" id="bBlk">${t.blockSlot}</button>`, () => {
+      $('#fB').onsubmit = async e => { e.preventDefault(); if (!$('#bS').value) return; try { await act('setSlots', { Car: car, Date: d, Slots: [x], Type: 'Booked', StudentID: $('#bS').value, Note: $('#bN').value.trim() }, t.saved); closeSheet(); } catch (z) { closeSheet(); } };
+      $('#bBlk').onclick = () => openBlock(car, d, [x]);
+    });
+    return;
+  }
+  if (b.Type === 'Blocked') {
+    sheet(title, `<p><b>${t.blocked}</b>${b.Note ? ' · ' + esc(b.Note) : ''}</p><p class="sub">${esc(b.LoggedBy || '')}</p>
+      <button class="btn primary big" id="bFree">${t.makeFree}</button>`, () => {
+      $('#bFree').onclick = async () => { await act('clearSlots', { Car: car, Date: d, Slots: [x] }, t.saved); closeSheet(); };
+    });
+    return;
+  }
+  const s = stuById(b.StudentID) || { Name: b.StudentID, Phone: '' };
+  sheet(title, `<dl class="kv"><dt>${t.student}</dt><dd>${esc(s.Name)}</dd>${s.tot ? `<dt>${t.lessons}</dt><dd>${n2(s.done)} / ${n2(s.tot)}</dd>` : ''}${b.Note ? `<dt>${t.note}</dt><dd>${esc(b.Note)}</dd>` : ''}<dt>${t.bookedBy || '✎'}</dt><dd>${esc(b.LoggedBy || '')}</dd></dl>
+    <div class="btns">${s.Phone ? `<a class="btn" href="tel:+91${esc(s.Phone)}">${t.call}</a><a class="btn wa" target="_blank" rel="noopener" href="${waLink(s.Phone, t.remindMsg(firstName(s.Name), fd(d, true), x, car))}">${t.remind}</a>` : ''}</div>
+    ${s.ID && s.Status === 'Active' ? `<button class="btn primary big" id="bDone">${t.lessonDone}</button>` : ''}
+    <button class="btn big" id="bCancel">${t.cancelBooking}</button>`, () => {
+    const dn = $('#bDone'); if (dn) dn.onclick = async () => { closeSheet(); await logLesson(s.ID, d, st.trainer || st.me); };
+    $('#bCancel').onclick = async () => { await act('clearSlots', { Car: car, Date: d, Slots: [x] }, t.saved); closeSheet(); };
+  });
+}
+
+function openBlock(car, d, slots) {
+  const t = T();
+  sheet(`${t.blockSlot} · ${car}`, `<p class="sub">${fd(d, true)} · ${slots.map(x => x).join(', ')}</p>
+    <form id="fK" style="display:flex;flex-direction:column;gap:12px">
+      <div class="f"><label for="kR">${t.reason}</label><input id="kR" maxlength="60" placeholder="${t.reasonPh}" autocomplete="off"></div>
+      <label class="sw"><input type="checkbox" id="kW"> ${t.repeat7}</label>
+      <button class="btn primary big" type="submit">${t.blockSel}</button></form>`, () => {
+    $('#fK').onsubmit = async e => {
+      e.preventDefault(); st.ttSel = null;
+      try { await act('setSlots', { Car: car, Date: d, Slots: slots, Type: 'Blocked', Note: $('#kR').value.trim(), Days: $('#kW').checked ? 7 : 1 }, t.saved); } catch (z) { }
+      closeSheet();
+    };
+  });
+}
+
+/* print: builds a plain table into #print and opens the browser's print screen (Save as PDF from there) */
+function printTT(kind) {
+  const t = T(), car = st.ttCar, slots = slotList(), school = (st.db.settings || {}).SchoolName || 'Soni Motor Training School';
+  const cellFor = b => { if (!b) return ''; if (b.Type === 'Blocked') return `<i>${t.blocked}${b.Note ? ': ' + esc(b.Note) : ''}</i>`; const s = stuById(b.StudentID); return esc(s ? s.Name : b.StudentID); };
+  let html, orient;
+  if (kind === 'day') {
+    const d = st.ttDate, B = bookingsOn(d, car); orient = 'portrait';
+    html = `<h1>${esc(school)} · ${esc(car)}</h1><h2>${fd(d, true)} ${d.slice(0, 4)}</h2>
+      <table class="pday"><thead><tr><th>${t.time}</th><th>${t.student}</th><th>${t.phone}</th><th>${t.note}</th><th>${t.tick}</th></tr></thead><tbody>
+      ${slots.map(x => { const b = B[x], s = b && b.Type === 'Booked' ? stuById(b.StudentID) : null; return `<tr class="${b && b.Type === 'Blocked' ? 'k' : ''}"><td>${x}–${slotEnd(x)}</td><td>${cellFor(b)}</td><td>${s ? esc(s.Phone) : ''}</td><td>${b && b.Type === 'Booked' ? esc(b.Note || '') : ''}</td><td></td></tr>`; }).join('')}
+      </tbody></table>`;
+  } else {
+    const w0 = weekStart(st.ttDate), days = Array.from({ length: 7 }, (_, i) => addDays(w0, i)); orient = 'landscape';
+    const Bs = days.map(d => bookingsOn(d, car));
+    html = `<h1>${esc(school)} · ${esc(car)}</h1><h2>${fd(days[0])} – ${fd(days[6])} ${days[6].slice(0, 4)}</h2>
+      <table class="pweek"><thead><tr><th>${t.time}</th>${days.map(d => `<th>${fd(d, true)}</th>`).join('')}</tr></thead><tbody>
+      ${slots.map(x => `<tr><td class="tm">${x}</td>${Bs.map(B => `<td class="${B[x] && B[x].Type === 'Blocked' ? 'k' : ''}">${B[x] && B[x].Type === 'Booked' ? esc(firstName((stuById(B[x].StudentID) || {}).Name || '')) : cellFor(B[x])}</td>`).join('')}</tr>`).join('')}
+      </tbody></table>`;
+  }
+  $('#print').innerHTML = `<style>@page{size:A4 ${orient};margin:9mm}</style>${html}<p class="pfoot">${t.printedOn} ${fd(today())} · ${esc(st.me || '')}</p>`;
+  toast(t.printHint);
+  setTimeout(() => { try { window.print(); } catch (e) { } }, 350);
+}
+
 /* ================= settings ================= */
 function openSettings() {
   const t = T();
   sheet(t.settings, `
-    <div class="f"><label for="xMe">${t.you}</label><select id="xMe">${trainerOpts(st.me)}</select></div>
+    ${st.db.me ? `<div class="f"><span class="lbl">${t.you}</span><div class="who">${esc(st.me)}</div></div>` : `<div class="f"><label for="xMe">${t.you}</label><select id="xMe">${trainerOpts(st.me)}</select></div>`}
     <div class="f"><label for="xTr">${t.defaultTrainer}</label><select id="xTr">${trainerOpts(st.trainer)}</select></div>
     <div class="f"><span class="lbl">${t.language}</span><div class="chips"><button class="chip" data-l="gu" aria-pressed="${st.lang === 'gu'}">ગુજરાતી</button><button class="chip" data-l="en" aria-pressed="${st.lang === 'en'}">English</button></div></div>
     <button class="btn big" id="xOut">${t.logout}</button>
     <p class="ver">${t.version} ${APP_VERSION}${st.db.version && st.db.version !== APP_VERSION ? ' · sheet ' + esc(st.db.version) : ''}</p>`, () => {
-    $('#xMe').onchange = e => { st.me = e.target.value; ls.set('me', st.me); };
+    if ($('#xMe')) $('#xMe').onchange = e => { st.me = e.target.value; ls.set('me', st.me); };
     $('#xTr').onchange = e => { st.trainer = e.target.value; ls.set('trainer', st.trainer); };
     document.querySelectorAll('[data-l]').forEach(b => b.onclick = () => { st.lang = b.dataset.l; ls.set('lang', st.lang); closeSheet(); render(); openSettings(); });
-    $('#xOut').onclick = () => { ls.del('pin'); ls.del('me'); ls.del('db'); st.pin = ''; st.me = ''; st.db = null; closeSheet(); render(); };
+    $('#xOut').onclick = () => { ls.del('pin'); ls.del('me'); ls.del('db'); st.tab = 'home'; st.pin = ''; st.me = ''; st.db = null; closeSheet(); render(); };
   });
 }
 
@@ -822,7 +1036,7 @@ const Mock = (() => {
   const td = istToday(), d = n => addDays(td, -n), rid = p => p + Math.random().toString(36).slice(2, 7).toUpperCase();
   const db = {
     today: td,
-    version: '1.2.1',
+    version: '1.3.0',
     settings: { SchoolName: 'Soni Motor Training School', SchoolPhone: '1000000001', ReviewLink: 'https://g.page/r/CWKtBfMYEdoAEBM/review', QuizLink: 'https://vnsr.github.io/soni-motor/quiz/',
       ReviewMsgGU: 'નમસ્તે {name}, સોની મોટર ટ્રેનિંગ સ્કૂલમાં ડ્રાઇવિંગ શીખવા બદલ આભાર! તમારો અનુભવ ગૂગલ પર બે લીટીમાં લખશો તો બીજા લોકોને સ્કૂલ પસંદ કરવામાં મદદ થશે: {link}',
       ReviewMsgEN: 'Hello {name}, thank you for learning to drive with Soni Motor Training School! If you write two lines about your experience on Google, it helps others choose a school: {link}',
@@ -835,7 +1049,7 @@ const Mock = (() => {
       { PackageID: 'P2', Car: 'Hyundai i20', Transmission: 'Manual', Lessons: 15, MinutesPerLesson: 30, PriceINR: 5500 },
       { PackageID: 'P3', Car: 'Maruti Baleno', Transmission: 'Automatic', Lessons: 12, MinutesPerLesson: 30, PriceINR: 6000 }
     ],
-    staff: ['Trainer', 'Office'], students: [], enquiries: [], lessons: [], payments: [], skills: []
+    staff: ['Trainer', 'Office'], students: [], enquiries: [], lessons: [], payments: [], skills: [], bookings: []
   };
   const S = [
     ['Riya Patel', '1000000002', 'P1', 34, 15, 5000, 'Completed', '', 'Google'],
@@ -863,9 +1077,16 @@ const Mock = (() => {
    ['Rohan Bhatt', '1000000012', 'Phone', 0, 'New', addDays(td, 1), ''], ['Sneha Solanki', '1000000013', 'Referral', 12, 'Lost', '', 'Hyundai i20'],
    ['Amit Rathod', '1000000014', 'WhatsApp', 6, 'Follow-up', addDays(td, 2), 'Maruti Swift'], ['Tanvi Pandya', '1000000015', 'Google', 20, 'Lost', '', '']]
     .forEach(([n, p, s, ago, stt, fu, car], i) => db.enquiries.push({ ID: 'EQ' + i, Date: d(ago), Name: n, Phone: p, Source: s, CarInterest: car, Note: '', Status: stt, FollowUp: fu }));
+  /* demo timetable: a few bookings and a lunch block today and tomorrow */
+  [[0, 'Maruti Swift', '07:00', 'S4'], [0, 'Maruti Swift', '07:30', 'S5'], [0, 'Maruti Swift', '17:00', 'S8'], [0, 'Maruti Baleno', '08:00', 'S3'], [0, 'Maruti Baleno', '18:30', 'S7'],
+   [1, 'Maruti Swift', '06:30', 'S6'], [1, 'Hyundai i20', '09:00', 'S6']]
+    .forEach(([dd, car, sl, sid]) => db.bookings.push({ ID: rid('B'), Date: addDays(td, dd), Car: car, Slot: sl, Type: 'Booked', StudentID: sid, Note: '', LoggedBy: 'Office' }));
+  [0, 1].forEach(dd => ['13:00', '13:30'].forEach(sl => db.bookings.push({ ID: rid('B'), Date: addDays(td, dd), Car: 'Maruti Swift', Slot: sl, Type: 'Blocked', StudentID: '', Note: 'Lunch', LoggedBy: 'Trainer' })));
+  const PINS = { '1993': 'Trainer', '2024': 'Office' };
   const copy = () => JSON.parse(JSON.stringify(db));
   function api(pin, action, p) {
-    if (String(pin) !== '1993') throw new Error('PIN');
+    const me = PINS[String(pin)]; if (!me) throw new Error('PIN');
+    p.LoggedBy = me;
     let result = null;
     const now = new Date().toISOString();
     if (action === 'addEnquiry') { result = Object.assign({ ID: rid('E'), Date: td, Status: 'New' }, p); db.enquiries.push(result); }
@@ -881,7 +1102,16 @@ const Mock = (() => {
     if (action === 'undoLesson') db.lessons = db.lessons.filter(l => l.ID !== p.ID);
     if (action === 'setSkill') { db.skills = db.skills.filter(x => !(x.StudentID === p.StudentID && x.Skill === p.Skill)); if (p.On) db.skills.push({ StudentID: p.StudentID, Skill: p.Skill, Date: td, LoggedBy: p.LoggedBy }); }
     if (action === 'addPayment') { result = { ID: rid('P'), Date: p.Date, StudentID: p.StudentID, AmountINR: p.AmountINR, Mode: p.Mode, LoggedBy: p.LoggedBy }; db.payments.push(result); }
-    return { db: copy(), result };
+    if (action === 'setSlots') {
+      const days = p.Type === 'Blocked' ? Math.max(1, +p.Days || 1) : 1, dates = Array.from({ length: days }, (_, i) => addDays(p.Date, i));
+      const hit = b => b.Car === p.Car && dates.includes(b.Date) && p.Slots.includes(b.Slot);
+      if (db.bookings.some(hit) && !p.Replace) throw new Error('TAKEN');
+      db.bookings = db.bookings.filter(b => !hit(b));
+      dates.forEach(d => p.Slots.forEach(sl => db.bookings.push({ ID: rid('B'), Date: d, Car: p.Car, Slot: sl, Type: p.Type, StudentID: p.Type === 'Booked' ? p.StudentID : '', Note: p.Note || '', LoggedBy: me })));
+    }
+    if (action === 'clearSlots') db.bookings = db.bookings.filter(b => !(b.Car === p.Car && b.Date === p.Date && p.Slots.includes(b.Slot)));
+    const out = copy(); out.me = me;
+    return { db: out, result };
   }
   return { api };
 })();

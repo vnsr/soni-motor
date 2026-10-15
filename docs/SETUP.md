@@ -1,4 +1,4 @@
-# Soni Motor app v1.2 — connect the Google Sheet and go live
+# Soni Motor app v1.3 — connect the Google Sheet and go live
 
 For the app admin. About 30 minutes remotely, plus 10 minutes on each phone at the school.
 
@@ -10,7 +10,8 @@ vnsr.github.io/soni-motor                                 (bound to the Sheet)  
 ```
 
 - The repo holds **code only**. Student names, numbers, payments and the PIN live only in the Sheet.
-- Every request is checked against the PIN in the Sheet's *Settings* tab. After 8 wrong PINs the API locks for 15 minutes.
+- **Everyone has their own PIN** (Staff tab). The Sheet works out who is using the app from the PIN and stamps every entry with that name; the phone can't claim to be someone else. After 8 wrong PINs the API locks for 15 minutes.
+- The **Activity** tab lists who logged in and who changed what, with time.
 - The app keeps the last loaded data on the phone, so it still opens without signal (read-only until the internet is back).
 
 ---
@@ -22,17 +23,19 @@ vnsr.github.io/soni-motor                                 (bound to the Sheet)  
 3. Delete everything in `Code.gs` and paste [`apps-script/Code.gs`](../apps-script/Code.gs). Press **Save** (disk icon).
 4. In the function menu at the top, choose **`setup`** and press **Run**.
 5. Google asks for permission. For your own script it shows *"Google hasn't verified this app"*: **Advanced → Go to (project name) (unsafe) → Allow**. It only gets access to this one Sheet.
-6. Open **Execution log** at the bottom. It shows the new **PIN** and a *Still to do* list.
+6. Open **Execution log** at the bottom. It shows each person's new **PIN** and a *Still to do* list. The PINs are also in the Staff tab.
 
-`setup` creates the tabs Settings, Staff, Packages, Enquiries, Students, Lessons, Payments and Skills. It removes an empty default tab (Sheet1 / Tabellenblatt1) and never deletes data, so you can run it again at any time.
+`setup` creates the tabs Settings, Staff, Packages, Enquiries, Students, Lessons, Payments, Skills, Bookings and Activity, and gives every person in Staff a PIN. It removes an empty default tab (Sheet1 / Tabellenblatt1) and never deletes data, so you can run it again at any time.
 
 ## 2. Fill in the Sheet (10 min)
 
 | Tab | What to enter |
 |---|---|
 | **Settings** | `SchoolPhone` (10 digits). `ReviewLink` is already filled with `g.page/r/CWKtBfMYEdoAEBM/review`. Check the `PIN`. The WhatsApp message texts can be edited here. |
-| **Staff** | One name per row, as they should appear in the app (replace `Trainer` / `Office`). |
+| **Staff** | One row per person: `Name` as it should appear in the app, `PIN` (4–8 digits, different for each person; run `setup` and it fills in random ones), `Active` Yes/No. Set **No** when someone leaves: their PIN stops working at once. |
 | **Packages** | One row per car: `PackageID` P1, P2 … · `Car` · `Transmission` Manual or Automatic · `Lessons` · `MinutesPerLesson` · `PriceINR` · `Active` Yes/No. |
+
+**Timetable:** `SlotStart` (06:30), `SlotEnd` (20:00) and `SlotMinutes` (30) in Settings set the day's slots. The cars are the car names in Packages; to list them yourself, fill `Cars` in Settings, comma-separated.
 
 Back in Apps Script, run **`checkSetup`** until the log says **Setup complete**. Until then the app shows an orange "Setup not finished" box on its home screen.
 
@@ -63,13 +66,14 @@ Commit. GitHub Pages republishes in about a minute. To see the demo with made-up
 
 ## 5. Test it yourself (10 min)
 
-- [ ] Wrong PIN is refused; the right PIN opens the app
+- [ ] A wrong PIN is refused; each person's PIN opens the app as that person (Settings shows the name)
 - [ ] New enquiry with your own number → *Make student* → price fills in from Packages
 - [ ] +1 lesson → *Undo* removes it again
 - [ ] Tick 3 skills → *Send progress card* opens WhatsApp with the card
 - [ ] Payment → balance drops
 - [ ] Mark complete → *Show review QR* → scan it with another phone, it opens the Google review form
-- [ ] Each step appears as a row in the Sheet
+- [ ] Timetable: book a slot, block two slots, print a day (Save as PDF)
+- [ ] Each step appears as a row in the Sheet, and in the Activity tab with your name
 - [ ] Delete your test rows in the Sheet (Enquiries, Students, Lessons, Payments, Skills)
 
 ## 6. Install on the phones (10 min each)
@@ -79,7 +83,7 @@ Send `https://vnsr.github.io/soni-motor/` on WhatsApp, then go through page 1 of
 - **Android:** open in **Chrome** → ⋮ → *Install app* (or *Add to Home screen*).
 - **iPhone:** open in **Safari** (not inside WhatsApp's browser) → Share ⬆ → *Add to Home Screen*.
 
-Then: enter the PIN once, choose the name. The app opens full screen from its red L icon.
+Then: each person enters **their own** PIN once. The app opens full screen from its red L icon.
 
 ## 7. Two-week trial
 
