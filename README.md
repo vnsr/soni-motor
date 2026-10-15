@@ -1,6 +1,6 @@
 # Soni Motor
 
-Phone app for Soni Motor Training School, Karelibaug, Vadodara: enquiries, students, one-tap lesson log, payments, progress cards, a per-car timetable (book, block, print), Google review requests and a weekly report. Gujarati and English.
+Phone app for Soni Motor Training School, Karelibaug, Vadodara: enquiries, students, one-tap lesson log, payments, progress cards, a timetable grid with one column per car (book, block, print), Google review requests and a weekly report. Gujarati and English.
 
 - **App:** <https://vnsr.github.io/soni-motor/> (installable PWA, Android and iPhone). Add `?demo` to try it with made-up data.
 - **Learner's licence practice quiz (public):** <https://vnsr.github.io/soni-motor/quiz/>
