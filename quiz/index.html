@@ -145,6 +145,29 @@ h2{font-size:18px;margin:0}
 .school p{margin:0;font-size:15px;color:var(--muted)}
 .school .num2{font-weight:700;color:var(--fg);user-select:all;font-variant-numeric:tabular-nums}
 .note{font-size:13px;color:var(--muted);margin:0}
+.school .acts{display:flex;flex-direction:column;gap:8px}
+.btn.wa.ghost{background:var(--surface);color:var(--ok);border:1.5px solid var(--ok)}
+/* lessons form */
+.form{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px;display:flex;flex-direction:column;gap:16px}
+.fld{display:flex;flex-direction:column;gap:6px;border:0;margin:0;padding:0;min-width:0}
+.fld>label,.fld legend{font-weight:600;font-size:15.5px;padding:0;margin-bottom:6px}
+.fld input[type=text],.fld input[type=tel]{font:inherit;font-size:18px;border:1.5px solid var(--line);border-radius:12px;padding:12px 14px;min-height:52px;background:var(--surface);color:var(--fg);width:100%}
+.fld input:focus{border-color:var(--fg);outline:none}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chips label{position:relative}
+.chips input{position:absolute;opacity:0;inset:0;margin:0;cursor:pointer}
+.chips span{display:inline-flex;align-items:center;min-height:44px;padding:8px 14px;border:1.5px solid var(--line);border-radius:999px;font-size:15.5px;background:var(--surface)}
+.chips input:checked+span{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+.chips input:focus-visible+span{outline:3px solid var(--accent);outline-offset:2px}
+.hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+.err{color:var(--bad);font-size:15px;margin:0;font-weight:600}
+.done{background:var(--surface);border:1px solid var(--ok);border-radius:var(--r);padding:20px 16px;display:flex;flex-direction:column;gap:12px}
+.done .tick{width:52px;height:52px;border-radius:50%;background:var(--ok);color:var(--accent-ink);display:grid;place-items:center;font-size:28px;font-weight:700}
+.done h1{font-size:23px}
+.done p{margin:0;font-size:16px}
+.kv2{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;font-size:15.5px;margin:0}
+.kv2 dt{color:var(--muted)} .kv2 dd{margin:0;font-weight:600}
+.ref{font:700 22px/1 var(--f-disp);letter-spacing:.04em;user-select:all}
 .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(20px + env(safe-area-inset-bottom,0px));z-index:30;background:var(--fg);color:var(--bg);border-radius:12px;padding:10px 16px;max-width:calc(100% - 32px);font-size:15px}
 @media (prefers-reduced-motion:no-preference){.q,.score,.ready{animation:in .22s ease-out}@keyframes in{from{transform:translateY(6px);opacity:.4}to{transform:none;opacity:1}}}
 </style>
@@ -181,14 +204,24 @@ const TXT = {
     passTxt: 'Good. Keep going until you pass three in a row.', failTxt: `Read the answers below and practise your weakest topic. Aim for ${PASS} or more out of ${ROUND}.`,
     again: 'New test', practiseWeak: t => `Practise: ${t}`, home: 'Home', missed: 'Check these', allRight: 'You answered every question correctly.',
     endPractice: 'End practice', practiceMeta: (a, c) => `${a} answered · ${c} correct`,
-    bookT: 'Learn to drive with Soni Motor', bookP: 'Car training with a patient instructor, from the first lesson to the RTO test.',
-    book: 'Book lessons on WhatsApp', bookMsg: 'Hello, I am using your learner licence practice and would like to know about driving lessons.',
-    callUs: 'WhatsApp', share: 'Share this practice', shareResult: 'Share my result',
+    bookT: 'Learn to drive with Soni Motor', bookP: 'Car training with a patient instructor, from the first lesson to the RTO test. Fill in the form, then visit our office to get started.',
+    join: 'Start driving lessons', joinSub: 'Fill this in, then visit our office to get started.',
+    fName: 'Your name', fPhone: 'Mobile number', fGear: 'Car', gear: { manual: 'Manual', automatic: 'Automatic', unsure: 'Not sure' },
+    fWhen: 'Best time for lessons', when: { morning: 'Morning', afternoon: 'Afternoon', evening: 'Evening' },
+    fLL: "Learner's licence", ll: { have: 'I have it', applied: 'Applied', no: 'Not yet' },
+    send: 'Send my details', sending: 'Sending…', consent: 'Your name and number go only to Soni Motor Training School, so we can contact you about lessons.',
+    errName: 'Please enter your name.', errPhone: 'Please enter a 10-digit mobile number.', errNet: 'Could not send. Check your internet and try again.',
+    errLimit: 'Too many forms from this phone today. Please call or WhatsApp us.',
+    thanks: n => `Thank you, ${n}!`, thanksP: 'We have your details. Come to our office to get started.',
+    office: 'Office', hours: 'Open', map: 'Open in Google Maps', ref: 'Your reference', refHint: 'Show this at the office.',
+    joinedT: 'Your details are with the school', joinedP: 'Visit our office to get started.', fillAgain: 'Send new details', defaultAddr: 'Karelibaug, Vadodara',
+    ask: 'Ask on WhatsApp', book: 'Ask on WhatsApp', bookMsg: 'Hello, I am using your learner licence practice and would like to know about driving lessons.',
+    callUs: 'WhatsApp / call', share: 'Share this practice', shareResult: 'Share my result',
     shareMsg: `Free learner's licence practice in Gujarati and English from Soni Motor Training School, Vadodara: ${QUIZ_URL}?src=share`,
     shareResultMsg: (n, t) => `I scored ${n}/${t} in the free learner's licence practice test from Soni Motor Training School, Vadodara. Try it: ${QUIZ_URL}?src=share`,
     copied: 'Link copied',
     note: 'Practice questions written by the school from the rules of the road. The real RTO test uses its own questions and pass mark.',
-    privacy: 'To improve this practice, the school counts test scores anonymously. No name, number or contact details are stored. Your progress stays on this phone.' },
+    privacy: 'To improve this practice, the school counts test scores anonymously, without names or numbers. Your progress stays on this phone. Your name and number are sent only if you fill in the lessons form.' },
   gu: { brand: 'સોની મોટર', sub: 'ટ્રેનિંગ સ્કૂલ · કારેલીબાગ, વડોદરા', title: 'લર્નિંગ લાઇસન્સ પ્રેક્ટિસ',
     intro: `ટ્રાફિક ચિહ્નો અને નિયમો પર ${BANK.length} પ્રશ્નો, ગુજરાતી અને અંગ્રેજીમાં. મફત, નોંધણી વગર.`,
     ready: 'ટેસ્ટ માટે તૈયાર', notReady: 'હજી પ્રેક્ટિસ જોઈએ', notStarted: 'હજી શરૂ નથી કર્યું',
@@ -202,14 +235,24 @@ const TXT = {
     passTxt: 'સરસ. સળંગ ત્રણ ટેસ્ટ પાસ થાય ત્યાં સુધી ચાલુ રાખો.', failTxt: `નીચેના જવાબ વાંચો અને નબળા વિષયની પ્રેક્ટિસ કરો. ${ROUND}માંથી ${PASS} કે વધુ લાવો.`,
     again: 'નવી ટેસ્ટ', practiseWeak: t => `પ્રેક્ટિસ: ${t}`, home: 'શરૂઆત', missed: 'આ ફરી વાંચો', allRight: 'તમે બધા પ્રશ્નોના સાચા જવાબ આપ્યા.',
     endPractice: 'પ્રેક્ટિસ પૂરી કરો', practiceMeta: (a, c) => `${a} જવાબ · ${c} સાચા`,
-    bookT: 'સોની મોટર સાથે ગાડી શીખો', bookP: 'પહેલા લેસનથી RTO ટેસ્ટ સુધી ધીરજવાન ટ્રેનર સાથે કાર ટ્રેનિંગ.',
-    book: 'વૉટ્સઍપ પર ક્લાસ બુક કરો', bookMsg: 'નમસ્તે, હું તમારી લર્નિંગ લાઇસન્સ પ્રેક્ટિસ વાપરું છું. મારે ડ્રાઇવિંગ ક્લાસ વિશે જાણવું છે.',
-    callUs: 'વૉટ્સઍપ', share: 'આ પ્રેક્ટિસ શેર કરો', shareResult: 'મારું પરિણામ શેર કરો',
+    bookT: 'સોની મોટર સાથે ગાડી શીખો', bookP: 'પહેલા લેસનથી RTO ટેસ્ટ સુધી ધીરજવાન ટ્રેનર સાથે કાર ટ્રેનિંગ. ફોર્મ ભરો, પછી શરૂ કરવા અમારી ઑફિસે આવો.',
+    join: 'ડ્રાઇવિંગ ક્લાસ શરૂ કરો', joinSub: 'આ ફોર્મ ભરો, પછી શરૂ કરવા અમારી ઑફિસે આવો.',
+    fName: 'તમારું નામ', fPhone: 'મોબાઇલ નંબર', fGear: 'ગાડી', gear: { manual: 'મેન્યુઅલ (ગિયરવાળી)', automatic: 'ઑટોમેટિક', unsure: 'ખબર નથી' },
+    fWhen: 'ક્લાસ માટે અનુકૂળ સમય', when: { morning: 'સવારે', afternoon: 'બપોરે', evening: 'સાંજે' },
+    fLL: 'લર્નિંગ લાઇસન્સ', ll: { have: 'મારી પાસે છે', applied: 'અરજી કરી છે', no: 'હજી નહીં' },
+    send: 'મારી વિગતો મોકલો', sending: 'મોકલી રહ્યા છીએ…', consent: 'તમારું નામ અને નંબર ફક્ત સોની મોટર ટ્રેનિંગ સ્કૂલ પાસે જશે, ક્લાસ વિશે તમારો સંપર્ક કરવા માટે.',
+    errName: 'કૃપા કરી તમારું નામ લખો.', errPhone: 'કૃપા કરી 10 આંકડાનો મોબાઇલ નંબર લખો.', errNet: 'મોકલી શકાયું નહીં. ઇન્ટરનેટ ચેક કરીને ફરી પ્રયત્ન કરો.',
+    errLimit: 'આજે આ ફોનથી ઘણાં ફોર્મ આવ્યાં છે. કૃપા કરી ફોન કે વૉટ્સઍપ કરો.',
+    thanks: n => `આભાર, ${n}!`, thanksP: 'તમારી વિગતો અમને મળી ગઈ છે. શરૂ કરવા અમારી ઑફિસે આવો.',
+    office: 'ઑફિસ', hours: 'સમય', map: 'ગૂગલ મૅપ્સમાં ખોલો', ref: 'તમારો રેફરન્સ', refHint: 'ઑફિસમાં આ બતાવો.',
+    joinedT: 'તમારી વિગતો સ્કૂલ પાસે છે', joinedP: 'શરૂ કરવા અમારી ઑફિસે આવો.', fillAgain: 'નવી વિગતો મોકલો', defaultAddr: 'કારેલીબાગ, વડોદરા',
+    ask: 'વૉટ્સઍપ પર પૂછો', book: 'વૉટ્સઍપ પર પૂછો', bookMsg: 'નમસ્તે, હું તમારી લર્નિંગ લાઇસન્સ પ્રેક્ટિસ વાપરું છું. મારે ડ્રાઇવિંગ ક્લાસ વિશે જાણવું છે.',
+    callUs: 'વૉટ્સઍપ / ફોન', share: 'આ પ્રેક્ટિસ શેર કરો', shareResult: 'મારું પરિણામ શેર કરો',
     shareMsg: `સોની મોટર ટ્રેનિંગ સ્કૂલ, વડોદરા તરફથી ગુજરાતી અને અંગ્રેજીમાં મફત લર્નિંગ લાઇસન્સ પ્રેક્ટિસ: ${QUIZ_URL}?src=share`,
     shareResultMsg: (n, t) => `સોની મોટર ટ્રેનિંગ સ્કૂલ, વડોદરાની મફત લર્નિંગ લાઇસન્સ પ્રેક્ટિસ ટેસ્ટમાં મારા ${t}માંથી ${n} સાચા આવ્યા. તમે પણ અજમાવો: ${QUIZ_URL}?src=share`,
     copied: 'લિંક કૉપી થઈ',
     note: 'આ પ્રશ્નો સ્કૂલે ટ્રાફિક નિયમોમાંથી તૈયાર કર્યા છે. સાચી RTO ટેસ્ટમાં RTOના પોતાના પ્રશ્નો અને પાસિંગ માર્ક હોય છે.',
-    privacy: 'આ પ્રેક્ટિસ સુધારવા સ્કૂલ ટેસ્ટના માર્ક નામ વગર ગણે છે. નામ, નંબર કે સંપર્કની કોઈ વિગત સચવાતી નથી. તમારી પ્રગતિ આ ફોનમાં જ રહે છે.' }
+    privacy: 'આ પ્રેક્ટિસ સુધારવા સ્કૂલ ટેસ્ટના માર્ક નામ કે નંબર વગર ગણે છે. તમારી પ્રગતિ આ ફોનમાં જ રહે છે. તમે ક્લાસનું ફોર્મ ભરો તો જ તમારું નામ અને નંબર મોકલાય છે.' }
 };
 
 /* ================= storage (this phone only) ================= */
@@ -234,7 +277,7 @@ function stat(event, extra) {
   fetch(API_URL, { method: 'POST', body, headers: { 'Content-Type': 'text/plain;charset=utf-8' }, keepalive: true }).catch(() => { });
 }
 let school = store.get('school', { phone: '' });
-if (API_URL) fetch(API_URL + '?public=1').then(r => r.json()).then(r => { if (r && r.ok) { school = { phone: r.phone || '', name: r.school || '' }; store.set('school', school); render(); } }).catch(() => { });
+if (API_URL) fetch(API_URL + '?public=1').then(r => r.json()).then(r => { if (r && r.ok) { school = { phone: r.phone || '', name: r.school || '', address: r.address || '', hours: r.hours || '', map: r.map || '' }; store.set('school', school); render(); } }).catch(() => { });
 
 /* ================= state ================= */
 const S = { lang: store.get('lang', 'gu'), view: 'home', set: [], i: 0, answers: [], topic: null, cur: null, pa: 0, pc: 0, timerEnd: 0 };
@@ -305,18 +348,31 @@ function goHome() { clearInterval(tick); S.view = 'home'; S.cur = null; render()
 function render() {
   document.documentElement.lang = S.lang;
   header();
-  ({ home: renderHome, test: renderTest, result: renderResult, practice: renderPractice })[S.view]();
+  ({ home: renderHome, test: renderTest, result: renderResult, practice: renderPractice, join: renderJoin, joined: renderJoined })[S.view]();
 }
 
+const schoolPhone = () => String(school.phone || '').replace(/\D/g, '').slice(-10);
+function waLink(cls) {
+  const t = T(), ph = schoolPhone();
+  return ph ? `<a class="btn wa ${cls || ''} full" id="bBook" href="https://wa.me/91${ph}?text=${encodeURIComponent(t.bookMsg)}" target="_blank" rel="noopener">${t.ask}</a>` : '';
+}
+function officeInfo() {
+  const t = T(), ph = schoolPhone(), addr = school.address || t.defaultAddr;
+  const map = school.map || (school.address ? 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent('Soni Motor Training School, ' + school.address) : '');
+  return `<dl class="kv2"><dt>${t.office}</dt><dd>${esc(addr)}</dd>${school.hours ? `<dt>${t.hours}</dt><dd>${esc(school.hours)}</dd>` : ''}${ph ? `<dt>${t.callUs}</dt><dd><a href="tel:+91${ph}" style="color:inherit">+91 ${ph.slice(0, 5)} ${ph.slice(5)}</a></dd>` : ''}</dl>
+    ${map ? `<a class="btn ghost full" href="${esc(map)}" target="_blank" rel="noopener">${t.map}</a>` : ''}`;
+}
 function schoolCard() {
-  const t = T(), ph = String(school.phone || '').replace(/\D/g, '').slice(-10);
+  const t = T(), j = store.get('joined', null);
+  if (j && j.ref) return `<section class="school"><h2>${t.joinedT}</h2><p>${t.joinedP} ${t.ref}: <b class="num2">${esc(j.ref)}</b></p>${officeInfo()}${waLink('ghost')}</section>`;
   return `<section class="school"><h2>${t.bookT}</h2><p>${t.bookP}</p>
-    ${ph ? `<a class="btn wa full" id="bBook" href="https://wa.me/91${ph}?text=${encodeURIComponent(t.bookMsg)}" target="_blank" rel="noopener">${t.book}</a><p>${t.callUs}: <span class="num2">+91 ${ph.slice(0, 5)} ${ph.slice(5)}</span></p>`
-      : `<p class="num2">Soni Motor Training School, Karelibaug, Vadodara</p>`}
+    <div class="acts">${API_URL ? `<button class="btn primary full" id="bJoin">${t.join}</button>` : ''}${waLink(API_URL ? 'ghost' : '')}</div>
+    ${!API_URL && !schoolPhone() ? `<p class="num2">Soni Motor Training School, Karelibaug, Vadodara</p>` : ''}
   </section>`;
 }
 function wireCommon() {
   const b = $('bBook'); if (b) b.addEventListener('click', () => stat('book'));
+  const jb = $('bJoin'); if (jb) jb.onclick = () => { S.view = 'join'; S.formErr = ''; render(); $('scroll').scrollTop = 0; };
   document.querySelectorAll('[data-share]').forEach(x => x.onclick = () => shareText(x.dataset.share === 'result' ? T().shareResultMsg(x.dataset.n, x.dataset.t) : T().shareMsg));
 }
 async function shareText(text) {
@@ -438,6 +494,63 @@ function renderPractice() {
     $('next').onclick = () => { S.cur = nextPractice(); render(); $('scroll').scrollTop = 0; };
   }
   $('endP').onclick = goHome;
+}
+
+/* ================= lessons form ================= */
+function chips(name, opts, cur) {
+  return `<div class="chips" role="radiogroup">${Object.keys(opts).map(k => `<label><input type="radio" name="${name}" value="${k}" ${cur === k ? 'checked' : ''}><span>${esc(opts[k])}</span></label>`).join('')}</div>`;
+}
+function renderJoin() {
+  const t = T(), f = S.form || (S.form = { Name: '', Phone: '', Gear: '', When: '', Licence: '' });
+  $('root').innerHTML = `
+    <div><h1>${t.join}</h1><p class="intro">${t.joinSub}</p></div>
+    <form class="form" id="jForm" novalidate>
+      <div class="fld"><label for="jName">${t.fName}</label><input type="text" id="jName" autocomplete="name" maxlength="60" value="${esc(f.Name)}" required></div>
+      <div class="fld"><label for="jPhone">${t.fPhone}</label><input type="tel" id="jPhone" autocomplete="tel" inputmode="numeric" maxlength="16" placeholder="98765 43210" value="${esc(f.Phone)}" required></div>
+      <fieldset class="fld"><legend>${t.fGear}</legend>${chips('Gear', t.gear, f.Gear)}</fieldset>
+      <fieldset class="fld"><legend>${t.fWhen}</legend>${chips('When', t.when, f.When)}</fieldset>
+      <fieldset class="fld"><legend>${t.fLL}</legend>${chips('Licence', t.ll, f.Licence)}</fieldset>
+      <div class="hp" aria-hidden="true"><label>Website <input type="text" id="jWeb" tabindex="-1" autocomplete="off"></label></div>
+      ${S.formErr ? `<p class="err" role="alert">${S.formErr}</p>` : ''}
+      <button class="btn primary full" type="submit" id="jSend">${t.send}</button>
+      <p class="note">${t.consent}</p>
+    </form>
+    ${waLink('ghost')}`;
+  const read = () => { const fd = new FormData($('jForm')); Object.assign(f, { Name: $('jName').value.trim(), Phone: $('jPhone').value.trim(), Gear: fd.get('Gear') || '', When: fd.get('When') || '', Licence: fd.get('Licence') || '' }); };
+  $('jForm').onchange = read;
+  $('jForm').onsubmit = async ev => {
+    ev.preventDefault(); read();
+    let ph = f.Phone.replace(/\D/g, ''); if (ph.length === 12 && ph.startsWith('91')) ph = ph.slice(2); if (ph.length === 11 && ph[0] === '0') ph = ph.slice(1);
+    const err = f.Name.length < 2 ? t.errName : !/^[6-9]\d{9}$/.test(ph) ? t.errPhone : '';
+    if (err) { S.formErr = err; render(); $(f.Name.length < 2 ? 'jName' : 'jPhone').focus(); return; }
+    const btn = $('jSend'); btn.disabled = true; btn.textContent = t.sending;
+    try {
+      const res = await fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ action: 'publicEnquiry', payload: { Name: f.Name, Phone: ph, Gear: f.Gear, When: f.When, Licence: f.Licence, Website: $('jWeb').value, Device: device, Source: source(), Lang: S.lang } }) });
+      const r = await res.json();
+      if (!r.ok) { S.formErr = r.error === 'PHONE' ? t.errPhone : r.error === 'NAME' ? t.errName : r.error === 'LIMIT' ? t.errLimit : t.errNet; render(); return; }
+      store.set('joined', { ref: r.ref, name: f.Name, d: Date.now() }); stat('form');
+      S.formErr = ''; S.view = 'joined'; render(); $('scroll').scrollTop = 0;
+    } catch (e) { S.formErr = t.errNet; render(); }
+  };
+  wireCommon();
+}
+function renderJoined() {
+  const t = T(), j = store.get('joined', {}) || {};
+  $('root').innerHTML = `
+    <section class="done" aria-live="polite">
+      <div class="tick" aria-hidden="true">✓</div>
+      <h1>${esc(t.thanks((j.name || '').split(' ')[0]))}</h1>
+      <p>${t.thanksP}</p>
+      ${j.ref ? `<div><p class="sub">${t.ref}</p><div class="ref">${esc(j.ref)}</div><p class="sub">${t.refHint}</p></div>` : ''}
+      ${officeInfo()}
+    </section>
+    ${waLink('ghost')}
+    <button class="btn ghost full" id="jHome">${t.home}</button>
+    <button class="btn ghost full" id="jAgain" style="min-height:44px;font-weight:500;border:0">${t.fillAgain}</button>`;
+  $('jHome').onclick = goHome;
+  $('jAgain').onclick = () => { store.set('joined', null); S.view = 'join'; render(); };
+  wireCommon();
 }
 
 render();

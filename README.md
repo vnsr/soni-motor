@@ -3,7 +3,7 @@
 Phone app for Soni Motor Training School, Karelibaug, Vadodara: enquiries, students, one-tap lesson log, payments, progress cards, a timetable grid with one column per car (book, block, print), Google review requests and a weekly report. Gujarati and English.
 
 - **App:** <https://vnsr.github.io/soni-motor/> (installable PWA, Android and iPhone). Add `?demo` to try it with made-up data.
-- **Learner's licence practice (public, free):** <https://vnsr.github.io/soni-motor/quiz/>. 197 questions written by the school (not the official RTO bank), Gujarati and English. Practice mode by topic, 15-question timed tests, and a *Ready / Needs more practice* verdict (3 passed tests in a row and 70% of the questions seen). Installable on its own. Visits are counted anonymously in the Sheet's QuizStats tab: no names, numbers or answers.
+- **Learner's licence practice (public, free):** <https://vnsr.github.io/soni-motor/quiz/>. 197 questions written by the school (not the official RTO bank), Gujarati and English. Practice mode by topic, 15-question timed tests, and a *Ready / Needs more practice* verdict (3 passed tests in a row and 70% of the questions seen). A *Start driving lessons* form sends name, number, car type, preferred time and licence status to the Enquiries tab (Source: Practice app form); the person then visits the office. Installable on its own. Visits are counted anonymously in the Sheet's QuizStats tab: no names, numbers or answers.
 
 ## Where the data lives
 

@@ -1,5 +1,5 @@
 /**
- * Soni Motor Training School — Sheet API for the phone app  · v1.2
+ * Soni Motor Training School — Sheet API for the phone app  · v1.5
  * The Google Sheet is the only data store. The phone app (a PWA on GitHub Pages) sends every
  * request here; this script checks the person's own PIN (Staff tab), stamps every entry with their
  * name, and is the only thing that reads or writes the sheet.
@@ -17,7 +17,7 @@
  *   The /exec URL stays the same, so the app needs no change.
  */
 
-const VERSION = '1.4.0';
+const VERSION = '1.5.0';
 const MAX_FAILS = 8, LOCK_SECONDS = 15 * 60;   // wrong-PIN protection
 
 const TABS = {
@@ -46,6 +46,9 @@ const DEFAULT_SETTINGS = [
   ['SlotMinutes', '30', 'Timetable: length of one slot in minutes'],
   ['Cars', '', 'Timetable: car names, comma-separated. Empty = the car names from Packages'],
   ['QuizLink', 'https://vnsr.github.io/soni-motor/quiz/', 'Public learner-licence practice quiz'],
+  ['OfficeAddress', '', 'Practice app: office address shown after someone sends the lessons form'],
+  ['OfficeHours', '', 'Practice app: office hours, e.g. Mon–Sat 8:00–19:00'],
+  ['MapLink', '', 'Practice app: Google Maps link to the office. Empty = search by OfficeAddress'],
   ['ReviewMsgGU', 'નમસ્તે {name}, સોની મોટર ટ્રેનિંગ સ્કૂલમાં ડ્રાઇવિંગ શીખવા બદલ આભાર! તમારો અનુભવ ગૂગલ પર બે લીટીમાં લખશો તો બીજા લોકોને સ્કૂલ પસંદ કરવામાં મદદ થશે: {link}', '{name} = first name, {link} = ReviewLink'],
   ['ReviewMsgEN', 'Hello {name}, thank you for learning to drive with Soni Motor Training School! If you write two lines about your experience on Google, it helps others choose a school: {link}', ''],
   ['FollowMsgGU', 'નમસ્તે {name}, સોની મોટર ટ્રેનિંગ સ્કૂલ તરફથી. ડ્રાઇવિંગ શીખવા વિશે પૂછપરછ કરવા બદલ આભાર. તમે ક્યારથી શરૂ કરવા માંગો છો?', ''],
@@ -57,12 +60,14 @@ const DEFAULT_SETTINGS = [
 /* ================= web app (JSON API) ================= */
 /**
  * Health check: opening the /exec URL in a browser shows this.
- * ?public=1 gives the public practice quiz the school's name and WhatsApp number (nothing else).
+ * ?public=1 gives the public practice quiz the school's name, WhatsApp number, office address,
+ * hours and map link (nothing else).
  */
 function doGet(e) {
   if (e && e.parameter && e.parameter.public === '1') {
     const s = readSettings_(SpreadsheetApp.getActive());
-    return json_({ ok: true, school: s.SchoolName || '', phone: phone_(s.SchoolPhone) });
+    return json_({ ok: true, school: s.SchoolName || '', phone: phone_(s.SchoolPhone),
+      address: clean_(s.OfficeAddress), hours: clean_(s.OfficeHours), map: /^https:\/\//.test(String(s.MapLink || '')) ? clean_(s.MapLink) : '' });
   }
   return json_({ ok: true, app: 'soni-motor', version: VERSION });
 }
@@ -77,6 +82,7 @@ function doPost(e) {
   try { req = JSON.parse((e && e.postData && e.postData.contents) || '{}'); } catch (x) { return json_({ ok: false, error: 'Bad request' }); }
   const cache = CacheService.getScriptCache();
   if (req.action === 'quizStat') return json_(quizStat_(req.payload || {}, cache));   // public, anonymous, no PIN
+  if (req.action === 'publicEnquiry') return json_(publicEnquiry_(req.payload || {}, cache));   // public lessons form, no PIN
   const fails = Number(cache.get('pinFails') || 0);
   if (fails >= MAX_FAILS) return json_({ ok: false, error: 'LOCKED' });
   try {
@@ -97,7 +103,7 @@ function doPost(e) {
  */
 function quizStat_(p, cache) {
   const device = String(p.Device || ''), event = String(p.Event || '');
-  if (!/^[a-z0-9]{6,20}$/.test(device) || ['open', 'test', 'book', 'share'].indexOf(event) < 0) return { ok: false, error: 'Bad stat' };
+  if (!/^[a-z0-9]{6,20}$/.test(device) || ['open', 'test', 'book', 'share', 'form'].indexOf(event) < 0) return { ok: false, error: 'Bad stat' };
   const day = today_(), kAll = 'qall:' + day, kDev = 'qd:' + day + ':' + device;
   const all = Number(cache.get(kAll) || 0), mine = Number(cache.get(kDev) || 0);
   if (all >= 3000 || mine >= 40) return { ok: true, skipped: true };
@@ -114,19 +120,57 @@ function quizStat_(p, cache) {
   return { ok: true };
 }
 
+/**
+ * "Start driving lessons" form in the public practice app. Adds a row to Enquiries (Source Practice,
+ * follow-up today) so the school sees it in the app. The person then visits the office.
+ * Guarded: a hidden field that only bots fill, valid Indian mobile numbers only, at most 3 forms per
+ * phone and 100 per day, and the same number within 30 days returns the existing enquiry.
+ */
+const FORM_WHEN = { morning: 'Morning / સવારે', afternoon: 'Afternoon / બપોરે', evening: 'Evening / સાંજે' };
+const FORM_LL = { have: 'Has learner licence / LL છે', applied: 'LL applied / LL માટે અરજી કરી', no: 'No LL yet / હજી LL નથી' };
+const FORM_GEAR = { manual: 'Manual', automatic: 'Automatic' };
+function publicEnquiry_(p, cache) {
+  if (String(p.Website || '')) return { ok: true, ref: '' };   // honeypot
+  const name = clean_(p.Name).replace(/[<>"]/g, '').slice(0, 60);
+  let phone = String(p.Phone || '').replace(/\D/g, '');
+  if (phone.length === 12 && phone.slice(0, 2) === '91') phone = phone.slice(2);
+  if (phone.length === 11 && phone[0] === '0') phone = phone.slice(1);
+  if (name.length < 2) return { ok: false, error: 'NAME' };
+  if (!/^[6-9]\d{9}$/.test(phone)) return { ok: false, error: 'PHONE' };
+  const device = /^[a-z0-9]{6,20}$/.test(String(p.Device || '')) ? String(p.Device) : 'none';
+  const day = today_(), kAll = 'eall:' + day, kDev = 'ed:' + day + ':' + device;
+  const all = Number(cache.get(kAll) || 0), mine = Number(cache.get(kDev) || 0);
+  if (all >= 100 || mine >= 3) return { ok: false, error: 'LIMIT' };
+  cache.put(kAll, String(all + 1), 21600); cache.put(kDev, String(mine + 1), 21600);
+  const lock = LockService.getScriptLock(); lock.waitLock(20000);
+  try {
+    const ss = SpreadsheetApp.getActive(), since = addDays_(day, -30);
+    const dup = rows_(ss, 'Enquiries').filter(function (r) { return phone_(r.Phone) === phone && String(r.Date) >= since && r.Status !== 'Lost' && r.Status !== 'Joined'; })[0];
+    if (dup) return { ok: true, ref: dup.ID, again: true };
+    const src = String(p.Source || '').toLowerCase().replace(/[^a-z0-9_-]/g, '').slice(0, 20);
+    const note = [FORM_WHEN[p.When], FORM_LL[p.Licence], src && src !== 'direct' ? 'Link: ' + src : ''].filter(Boolean).join(' · ');
+    const now = new Date().toISOString();
+    const r = { ID: newId_('E'), Date: day, Name: name, Phone: phone, Source: 'Practice', CarInterest: FORM_GEAR[p.Gear] || '', Note: note,
+      Status: 'New', FollowUp: day, LoggedBy: 'Practice app form', Timestamp: now };
+    append_(ss, 'Enquiries', r);
+    append_(ss, 'Activity', { Timestamp: now, Name: 'Practice app form', Action: 'addEnquiry', Ref: r.ID });
+    return { ok: true, ref: r.ID };
+  } finally { lock.releaseLock(); }
+}
+
 /** Weekly quiz numbers for the app's Report: last 8 weeks, plus where people came from in the last 4. */
 function quizSummary_(ss) {
   const rows = rows_(ss, 'QuizStats'); if (!rows.length) return null;
   const monday = function (iso) { const d = new Date(String(iso).slice(0, 10) + 'T00:00:00Z'); d.setUTCDate(d.getUTCDate() - (d.getUTCDay() + 6) % 7); return d.toISOString().slice(0, 10); };
   const w0 = monday(today_()), weeks = {}, src = {};
-  for (let i = 0; i < 8; i++) weeks[addDays_(w0, -7 * i)] = { devices: {}, opens: 0, tests: 0, ready: 0, book: 0, share: 0 };
+  for (let i = 0; i < 8; i++) weeks[addDays_(w0, -7 * i)] = { devices: {}, opens: 0, tests: 0, ready: 0, book: 0, share: 0, form: 0 };
   const from4 = addDays_(w0, -21);
   rows.forEach(function (r) {
     const day = String(r.Timestamp).slice(0, 10), w = weeks[monday(day)];
-    if (w) { w.devices[r.Device] = 1; if (r.Event === 'open') w.opens++; if (r.Event === 'test') { w.tests++; if (r.Ready === 'yes') w.ready++; } if (r.Event === 'book') w.book++; if (r.Event === 'share') w.share++; }
+    if (w) { w.devices[r.Device] = 1; if (r.Event === 'open') w.opens++; if (r.Event === 'test') { w.tests++; if (r.Ready === 'yes') w.ready++; } if (r.Event === 'book') w.book++; if (r.Event === 'share') w.share++; if (r.Event === 'form') w.form++; }
     if (r.Event === 'open' && day >= from4) { const k = r.Source || 'direct'; src[k] = (src[k] || 0) + 1; }
   });
-  return { weeks: Object.keys(weeks).sort().map(function (k) { const w = weeks[k]; return { week: k, people: Object.keys(w.devices).length, tests: w.tests, ready: w.ready, book: w.book, share: w.share }; }), sources: src };
+  return { weeks: Object.keys(weeks).sort().map(function (k) { const w = weeks[k]; return { week: k, people: Object.keys(w.devices).length, tests: w.tests, ready: w.ready, book: w.book, share: w.share, form: w.form }; }), sources: src };
 }
 
 function json_(o) {

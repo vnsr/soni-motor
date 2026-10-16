@@ -1,4 +1,4 @@
-# Soni Motor app v1.4 — connect the Google Sheet and go live
+# Soni Motor app v1.5 — connect the Google Sheet and go live
 
 For the app admin. About 30 minutes remotely, plus 10 minutes on each phone at the school.
 
@@ -31,7 +31,7 @@ vnsr.github.io/soni-motor                                 (bound to the Sheet)  
 
 | Tab | What to enter |
 |---|---|
-| **Settings** | `SchoolPhone` (10 digits). The practice quiz shows its *Book lessons* button only once this is filled. `ReviewLink` is already filled with `g.page/r/CWKtBfMYEdoAEBM/review`. Check the `PIN`. The WhatsApp message texts can be edited here. |
+| **Settings** | `SchoolPhone` (10 digits). The practice app shows the WhatsApp button and number only once this is filled. Also fill `OfficeAddress` and `OfficeHours` (shown to people after they send the lessons form) and, if you like, `MapLink` (the Google Maps link of the office). `ReviewLink` is already filled with `g.page/r/CWKtBfMYEdoAEBM/review`. Check the `PIN`. The WhatsApp message texts can be edited here. |
 | **Staff** | One row per person: `Name` as it should appear in the app, `PIN` (4–8 digits, different for each person; run `setup` and it fills in random ones), `Active` Yes/No. Set **No** when someone leaves: their PIN stops working at once. |
 | **Packages** | One row per car: `PackageID` P1, P2 … · `Car` · `Transmission` Manual or Automatic · `Lessons` · `MinutesPerLesson` · `PriceINR` · `Active` Yes/No. |
 
@@ -44,7 +44,7 @@ Back in Apps Script, run **`checkSetup`** until the log says **Setup complete**.
 1. **Deploy → New deployment → ⚙ Select type → Web app.**
 2. Description: `Soni Motor API`. Execute as: **Me**. Who has access: **Anyone**.
 3. **Deploy**, then copy the **Web app URL**. It ends in `/exec`.
-4. Check it: open the URL in a browser. You should see `{"ok":true,"app":"soni-motor","version":"1.4.0"}`.
+4. Check it: open the URL in a browser. You should see `{"ok":true,"app":"soni-motor","version":"1.5.0"}`.
 
 "Anyone" is needed because the phones aren't signed in to Google. The PIN is what protects the data.
 
@@ -68,6 +68,8 @@ Commit. GitHub Pages republishes in about a minute. To see the demo with made-up
 
 The public practice at <https://vnsr.github.io/soni-motor/quiz/> needs no PIN. It sends the Sheet only anonymous events, which land in the **QuizStats** tab: a random device code, the event (`open`, `test`, `book`, `share`), the test score, language, whether the person counts as ready, and where they came from. No names, phone numbers or answers. The app's Report tab sums them per week.
 
+**Lessons form.** *Start driving lessons* in the practice app asks for name, mobile number, manual/automatic, preferred time and learner's licence status. It adds a row to **Enquiries** with Source *Practice app form*, status New and follow-up today, so it shows up in the app's Enquiries and follow-ups. The person sees a reference number and the office address and is asked to visit the office. Protection: only valid Indian mobile numbers, at most 3 forms per phone and 100 a day, a hidden field that catches bots, and the same number within 30 days doesn't create a second row. This is the one place the practice app sends personal data, and only when the person fills in the form.
+
 Where people came from is read from `?src=` in the link. Use one per channel so the Report shows what works:
 
 | Link | Use it on |
@@ -90,6 +92,7 @@ Limits built in: at most 40 events per phone and 3,000 per day, and one *open* p
 - [ ] Timetable: book a slot, block two slots, print a day (Save as PDF)
 - [ ] Each step appears as a row in the Sheet, and in the Activity tab with your name
 - [ ] Open the quiz with `?src=flyer`, finish one test → two rows in QuizStats; the Report tab shows them
+- [ ] Send the lessons form with your own number → a new enquiry appears in the app; delete it afterwards
 - [ ] Delete your test rows in the Sheet (Enquiries, Students, Lessons, Payments, Skills)
 
 ## 6. Install on the phones (10 min each)
