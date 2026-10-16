@@ -17,7 +17,7 @@
  *   The /exec URL stays the same, so the app needs no change.
  */
 
-const VERSION = '1.5.0';
+const VERSION = '1.5.1';
 const MAX_FAILS = 8, LOCK_SECONDS = 15 * 60;   // wrong-PIN protection
 
 const TABS = {
@@ -48,7 +48,8 @@ const DEFAULT_SETTINGS = [
   ['QuizLink', 'https://vnsr.github.io/soni-motor/quiz/', 'Public learner-licence practice quiz'],
   ['OfficeAddress', '', 'Practice app: office address shown after someone sends the lessons form'],
   ['OfficeHours', '', 'Practice app: office hours, e.g. Mon–Sat 8:00–19:00'],
-  ['MapLink', '', 'Practice app: Google Maps link to the office. Empty = search by OfficeAddress'],
+  ['ContactPerson', '', 'Practice app: contact person shown with the phone number, e.g. the proprietor'],
+  ['MapLink', '', 'Practice app: Google Maps link to the office. Empty = directions to OfficeAddress'],
   ['ReviewMsgGU', 'નમસ્તે {name}, સોની મોટર ટ્રેનિંગ સ્કૂલમાં ડ્રાઇવિંગ શીખવા બદલ આભાર! તમારો અનુભવ ગૂગલ પર બે લીટીમાં લખશો તો બીજા લોકોને સ્કૂલ પસંદ કરવામાં મદદ થશે: {link}', '{name} = first name, {link} = ReviewLink'],
   ['ReviewMsgEN', 'Hello {name}, thank you for learning to drive with Soni Motor Training School! If you write two lines about your experience on Google, it helps others choose a school: {link}', ''],
   ['FollowMsgGU', 'નમસ્તે {name}, સોની મોટર ટ્રેનિંગ સ્કૂલ તરફથી. ડ્રાઇવિંગ શીખવા વિશે પૂછપરછ કરવા બદલ આભાર. તમે ક્યારથી શરૂ કરવા માંગો છો?', ''],
@@ -60,14 +61,14 @@ const DEFAULT_SETTINGS = [
 /* ================= web app (JSON API) ================= */
 /**
  * Health check: opening the /exec URL in a browser shows this.
- * ?public=1 gives the public practice quiz the school's name, WhatsApp number, office address,
- * hours and map link (nothing else).
+ * ?public=1 gives the public practice quiz the school's name, WhatsApp number, contact person,
+ * office address, hours and map link (nothing else).
  */
 function doGet(e) {
   if (e && e.parameter && e.parameter.public === '1') {
     const s = readSettings_(SpreadsheetApp.getActive());
     return json_({ ok: true, school: s.SchoolName || '', phone: phone_(s.SchoolPhone),
-      address: clean_(s.OfficeAddress), hours: clean_(s.OfficeHours), map: /^https:\/\//.test(String(s.MapLink || '')) ? clean_(s.MapLink) : '' });
+      contact: clean_(s.ContactPerson).slice(0, 80), address: clean_(s.OfficeAddress), hours: clean_(s.OfficeHours), map: /^https:\/\//.test(String(s.MapLink || '')) ? clean_(s.MapLink) : '' });
   }
   return json_({ ok: true, app: 'soni-motor', version: VERSION });
 }

@@ -287,7 +287,7 @@ const I18N = {
     noCars: 'No cars yet. Add them in the Packages tab of the sheet.', slotsSummary: (b, k, f) => `${b} booked · ${k} blocked · ${f} free`,
     taken: 'Someone just changed one of these slots. The timetable is refreshed; please check and try again.',
     quizT: 'Practice quiz (anonymous)', quizCols: ['Week', 'People', 'Tests', 'Ready', 'Forms', 'Shared'], quizSources: 'Where visitors came from, last 4 weeks', quizNone: 'No quiz visits yet.',
-    srcName: { share: 'Shared by someone', flyer: 'Flyer QR code', gbp: 'Google profile', app: 'Installed app', direct: 'Direct link', card: 'Review card' },
+    srcName: { share: 'Shared by someone', flyer: 'Flyer QR code', gbp: 'Google profile', app: 'Installed app', direct: 'Direct link', card: 'Review card', office: 'Office poster' },
     bookedBy: 'Booked by', todayBookings: "Today's timetable", nextBooking: 'Next lesson', time: 'Time', tick: 'Done', printedOn: 'Printed',
     remindMsg: (n, d, tm, car) => `Hello ${n}, a reminder from Soni Motor Training School: your driving lesson is on ${d} at ${tm} (${car}). See you then!`,
     skill: {
@@ -346,7 +346,7 @@ const I18N = {
     noCars: 'હજી ગાડીઓ નથી. શીટના Packages ટૅબમાં ઉમેરો.', slotsSummary: (b, k, f) => `${b} બુક · ${k} બંધ · ${f} ખાલી`,
     taken: 'આમાંનો કોઈ સ્લૉટ હમણાં બીજા કોઈએ બદલ્યો. સમયપત્રક તાજું કર્યું; જોઈને ફરી પ્રયત્ન કરો.',
     quizT: 'પ્રેક્ટિસ ક્વિઝ (નામ વગર)', quizCols: ['અઠવાડિયું', 'લોકો', 'ટેસ્ટ', 'તૈયાર', 'ફોર્મ', 'શેર'], quizSources: 'મુલાકાતીઓ ક્યાંથી આવ્યા, છેલ્લા 4 અઠવાડિયા', quizNone: 'હજી ક્વિઝની કોઈ મુલાકાત નથી.',
-    srcName: { share: 'કોઈએ શેર કર્યું', flyer: 'ફ્લાયરનો QR કોડ', gbp: 'ગૂગલ પ્રોફાઇલ', app: 'ઇન્સ્ટૉલ કરેલી ઍપ', direct: 'સીધી લિંક', card: 'રિવ્યૂ કાર્ડ' },
+    srcName: { share: 'કોઈએ શેર કર્યું', flyer: 'ફ્લાયરનો QR કોડ', gbp: 'ગૂગલ પ્રોફાઇલ', app: 'ઇન્સ્ટૉલ કરેલી ઍપ', direct: 'સીધી લિંક', card: 'રિવ્યૂ કાર્ડ', office: 'ઑફિસનું પોસ્ટર' },
     bookedBy: 'બુક કરનાર', todayBookings: 'આજનું સમયપત્રક', nextBooking: 'આગળનો લેસન', time: 'સમય', tick: 'થયું', printedOn: 'છાપ્યું',
     remindMsg: (n, d, tm, car) => `નમસ્તે ${n}, સોની મોટર ટ્રેનિંગ સ્કૂલ તરફથી યાદ અપાવીએ છીએ: તમારો ડ્રાઇવિંગ લેસન ${d}ના રોજ ${tm} વાગ્યે છે (${car}). મળીએ!`,
     skill: {
@@ -361,7 +361,7 @@ const SOURCES = ['Walk-in', 'Phone', 'WhatsApp', 'Google', 'Referral', 'Other'];
 const MODES = ['Cash', 'UPI', 'Card'];
 const LICS = ['None', 'Learner', 'Permanent'];
 const SKILLS = ['controls', 'moveoff', 'clutch', 'steering', 'turns', 'signals', 'traffic', 'reverse', 'parking', 'slope', 'rto'];
-const APP_VERSION = '1.5.0';
+const APP_VERSION = '1.5.1';
 
 /* ================= storage ================= */
 const ls = {

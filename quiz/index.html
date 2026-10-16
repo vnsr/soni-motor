@@ -213,10 +213,10 @@ const TXT = {
     errName: 'Please enter your name.', errPhone: 'Please enter a 10-digit mobile number.', errNet: 'Could not send. Check your internet and try again.',
     errLimit: 'Too many forms from this phone today. Please call or WhatsApp us.',
     thanks: n => `Thank you, ${n}!`, thanksP: 'We have your details. Come to our office to get started.',
-    office: 'Office', hours: 'Open', map: 'Open in Google Maps', ref: 'Your reference', refHint: 'Show this at the office.',
+    office: 'Office', hours: 'Open', contact: 'Contact', map: 'Get directions', ref: 'Your reference', refHint: 'Show this at the office.',
     joinedT: 'Your details are with the school', joinedP: 'Visit our office to get started.', fillAgain: 'Send new details', defaultAddr: 'Karelibaug, Vadodara',
     ask: 'Ask on WhatsApp', book: 'Ask on WhatsApp', bookMsg: 'Hello, I am using your learner licence practice and would like to know about driving lessons.',
-    callUs: 'WhatsApp / call', share: 'Share this practice', shareResult: 'Share my result',
+    callUs: 'Phone / WhatsApp', share: 'Share this practice', shareResult: 'Share my result',
     shareMsg: `Free learner's licence practice in Gujarati and English from Soni Motor Training School, Vadodara: ${QUIZ_URL}?src=share`,
     shareResultMsg: (n, t) => `I scored ${n}/${t} in the free learner's licence practice test from Soni Motor Training School, Vadodara. Try it: ${QUIZ_URL}?src=share`,
     copied: 'Link copied',
@@ -244,10 +244,10 @@ const TXT = {
     errName: 'કૃપા કરી તમારું નામ લખો.', errPhone: 'કૃપા કરી 10 આંકડાનો મોબાઇલ નંબર લખો.', errNet: 'મોકલી શકાયું નહીં. ઇન્ટરનેટ ચેક કરીને ફરી પ્રયત્ન કરો.',
     errLimit: 'આજે આ ફોનથી ઘણાં ફોર્મ આવ્યાં છે. કૃપા કરી ફોન કે વૉટ્સઍપ કરો.',
     thanks: n => `આભાર, ${n}!`, thanksP: 'તમારી વિગતો અમને મળી ગઈ છે. શરૂ કરવા અમારી ઑફિસે આવો.',
-    office: 'ઑફિસ', hours: 'સમય', map: 'ગૂગલ મૅપ્સમાં ખોલો', ref: 'તમારો રેફરન્સ', refHint: 'ઑફિસમાં આ બતાવો.',
+    office: 'ઑફિસ', hours: 'સમય', contact: 'સંપર્ક', map: 'રસ્તો જુઓ (ગૂગલ મૅપ્સ)', ref: 'તમારો રેફરન્સ', refHint: 'ઑફિસમાં આ બતાવો.',
     joinedT: 'તમારી વિગતો સ્કૂલ પાસે છે', joinedP: 'શરૂ કરવા અમારી ઑફિસે આવો.', fillAgain: 'નવી વિગતો મોકલો', defaultAddr: 'કારેલીબાગ, વડોદરા',
     ask: 'વૉટ્સઍપ પર પૂછો', book: 'વૉટ્સઍપ પર પૂછો', bookMsg: 'નમસ્તે, હું તમારી લર્નિંગ લાઇસન્સ પ્રેક્ટિસ વાપરું છું. મારે ડ્રાઇવિંગ ક્લાસ વિશે જાણવું છે.',
-    callUs: 'વૉટ્સઍપ / ફોન', share: 'આ પ્રેક્ટિસ શેર કરો', shareResult: 'મારું પરિણામ શેર કરો',
+    callUs: 'ફોન / વૉટ્સઍપ', share: 'આ પ્રેક્ટિસ શેર કરો', shareResult: 'મારું પરિણામ શેર કરો',
     shareMsg: `સોની મોટર ટ્રેનિંગ સ્કૂલ, વડોદરા તરફથી ગુજરાતી અને અંગ્રેજીમાં મફત લર્નિંગ લાઇસન્સ પ્રેક્ટિસ: ${QUIZ_URL}?src=share`,
     shareResultMsg: (n, t) => `સોની મોટર ટ્રેનિંગ સ્કૂલ, વડોદરાની મફત લર્નિંગ લાઇસન્સ પ્રેક્ટિસ ટેસ્ટમાં મારા ${t}માંથી ${n} સાચા આવ્યા. તમે પણ અજમાવો: ${QUIZ_URL}?src=share`,
     copied: 'લિંક કૉપી થઈ',
@@ -277,7 +277,7 @@ function stat(event, extra) {
   fetch(API_URL, { method: 'POST', body, headers: { 'Content-Type': 'text/plain;charset=utf-8' }, keepalive: true }).catch(() => { });
 }
 let school = store.get('school', { phone: '' });
-if (API_URL) fetch(API_URL + '?public=1').then(r => r.json()).then(r => { if (r && r.ok) { school = { phone: r.phone || '', name: r.school || '', address: r.address || '', hours: r.hours || '', map: r.map || '' }; store.set('school', school); render(); } }).catch(() => { });
+if (API_URL) fetch(API_URL + '?public=1').then(r => r.json()).then(r => { if (r && r.ok) { school = { phone: r.phone || '', name: r.school || '', contact: r.contact || '', address: r.address || '', hours: r.hours || '', map: r.map || '' }; store.set('school', school); render(); } }).catch(() => { });
 
 /* ================= state ================= */
 const S = { lang: store.get('lang', 'gu'), view: 'home', set: [], i: 0, answers: [], topic: null, cur: null, pa: 0, pc: 0, timerEnd: 0 };
@@ -358,8 +358,8 @@ function waLink(cls) {
 }
 function officeInfo() {
   const t = T(), ph = schoolPhone(), addr = school.address || t.defaultAddr;
-  const map = school.map || (school.address ? 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent('Soni Motor Training School, ' + school.address) : '');
-  return `<dl class="kv2"><dt>${t.office}</dt><dd>${esc(addr)}</dd>${school.hours ? `<dt>${t.hours}</dt><dd>${esc(school.hours)}</dd>` : ''}${ph ? `<dt>${t.callUs}</dt><dd><a href="tel:+91${ph}" style="color:inherit">+91 ${ph.slice(0, 5)} ${ph.slice(5)}</a></dd>` : ''}</dl>
+  const map = school.map || (school.address ? 'https://www.google.com/maps/dir/?api=1&destination=' + encodeURIComponent('Soni Motor Training School, ' + school.address) : '');
+  return `<dl class="kv2"><dt>${t.office}</dt><dd>${esc(addr)}</dd>${school.hours ? `<dt>${t.hours}</dt><dd>${esc(school.hours)}</dd>` : ''}${school.contact ? `<dt>${t.contact}</dt><dd>${esc(school.contact)}</dd>` : ''}${ph ? `<dt>${t.callUs}</dt><dd><a href="tel:+91${ph}" style="color:inherit">+91 ${ph.slice(0, 5)} ${ph.slice(5)}</a></dd>` : ''}</dl>
     ${map ? `<a class="btn ghost full" href="${esc(map)}" target="_blank" rel="noopener">${t.map}</a>` : ''}`;
 }
 function schoolCard() {
@@ -367,7 +367,7 @@ function schoolCard() {
   if (j && j.ref) return `<section class="school"><h2>${t.joinedT}</h2><p>${t.joinedP} ${t.ref}: <b class="num2">${esc(j.ref)}</b></p>${officeInfo()}${waLink('ghost')}</section>`;
   return `<section class="school"><h2>${t.bookT}</h2><p>${t.bookP}</p>
     <div class="acts">${API_URL ? `<button class="btn primary full" id="bJoin">${t.join}</button>` : ''}${waLink(API_URL ? 'ghost' : '')}</div>
-    ${!API_URL && !schoolPhone() ? `<p class="num2">Soni Motor Training School, Karelibaug, Vadodara</p>` : ''}
+    ${officeInfo()}
   </section>`;
 }
 function wireCommon() {

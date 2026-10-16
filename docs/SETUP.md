@@ -31,7 +31,7 @@ vnsr.github.io/soni-motor                                 (bound to the Sheet)  
 
 | Tab | What to enter |
 |---|---|
-| **Settings** | `SchoolPhone` (10 digits). The practice app shows the WhatsApp button and number only once this is filled. Also fill `OfficeAddress` and `OfficeHours` (shown to people after they send the lessons form) and, if you like, `MapLink` (the Google Maps link of the office). `ReviewLink` is already filled with `g.page/r/CWKtBfMYEdoAEBM/review`. Check the `PIN`. The WhatsApp message texts can be edited here. |
+| **Settings** | `SchoolPhone` (10 digits). The practice app shows the WhatsApp button and number only once this is filled. Also fill `OfficeAddress`, `OfficeHours` and `ContactPerson`: the practice app shows them with the phone number and a *Get directions* button (Google Maps directions to the address, or to `MapLink` if you fill it). They live only in the Sheet, never in this public repo. `ReviewLink` is already filled with `g.page/r/CWKtBfMYEdoAEBM/review`. Check the `PIN`. The WhatsApp message texts can be edited here. |
 | **Staff** | One row per person: `Name` as it should appear in the app, `PIN` (4–8 digits, different for each person; run `setup` and it fills in random ones), `Active` Yes/No. Set **No** when someone leaves: their PIN stops working at once. |
 | **Packages** | One row per car: `PackageID` P1, P2 … · `Car` · `Transmission` Manual or Automatic · `Lessons` · `MinutesPerLesson` · `PriceINR` · `Active` Yes/No. |
 
@@ -44,7 +44,7 @@ Back in Apps Script, run **`checkSetup`** until the log says **Setup complete**.
 1. **Deploy → New deployment → ⚙ Select type → Web app.**
 2. Description: `Soni Motor API`. Execute as: **Me**. Who has access: **Anyone**.
 3. **Deploy**, then copy the **Web app URL**. It ends in `/exec`.
-4. Check it: open the URL in a browser. You should see `{"ok":true,"app":"soni-motor","version":"1.5.0"}`.
+4. Check it: open the URL in a browser. You should see `{"ok":true,"app":"soni-motor","version":"1.5.1"}`.
 
 "Anyone" is needed because the phones aren't signed in to Google. The PIN is what protects the data.
 
@@ -74,7 +74,8 @@ Where people came from is read from `?src=` in the link. Use one per channel so 
 
 | Link | Use it on |
 |---|---|
-| `…/quiz/?src=flyer` | Printed flyer / QR at the office |
+| `…/quiz/?src=flyer` | Printed flyer |
+| `…/quiz/?src=office` | Poster on the office wall |
 | `…/quiz/?src=gbp` | Google Business Profile posts |
 | `…/quiz/?src=card` | Review card and WhatsApp messages to students |
 | `…/quiz/?src=share` | Added automatically when someone shares their result |
