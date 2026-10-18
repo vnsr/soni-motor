@@ -1,4 +1,4 @@
-# Soni Motor app v1.5 — connect the Google Sheet and go live
+# Soni Motor app v2.0 — connect the Google Sheet and go live
 
 For the app admin. About 30 minutes remotely, plus 10 minutes on each phone at the school.
 
@@ -10,9 +10,21 @@ vnsr.github.io/soni-motor                                 (bound to the Sheet)  
 ```
 
 - The repo holds **code only**. Student names, numbers, payments and the PIN live only in the Sheet.
-- **Everyone has their own PIN** (Staff tab). The Sheet works out who is using the app from the PIN and stamps every entry with that name; the phone can't claim to be someone else. After 8 wrong PINs the API locks for 15 minutes.
+- **Everyone has their own 6-digit PIN** (Staff tab). The Sheet works out who is using the app from the PIN and stamps every entry with that name; the phone can't claim to be someone else.
+- **Wrong PINs:** a phone that guesses wrong 5 times is locked for 15 minutes. If 30 wrong PINs arrive from anywhere within 15 minutes, phones that have never logged in are locked too, but phones that logged in before keep working, and `OwnerEmail` gets an email. A lost phone: run `forgetPhones` in Apps Script.
 - The **Activity** tab lists who logged in and who changed what, with time.
-- The app keeps the last loaded data on the phone, so it still opens without signal (read-only until the internet is back).
+- The app keeps the last loaded data on the phone, so it still opens without signal. Lessons, payments, enquiries, new students, skills and licence dates added without signal are kept on the phone (a grey bar says how many) and sent in order when the internet is back; each is saved once even if it is sent twice. Booking the timetable and making student links need internet.
+- Students who finished more than `ArchiveDays` (180) days ago and owe nothing stay in the Sheet but are no longer sent to the phones.
+
+---
+
+## Upgrading from v1.5
+
+1. Apps Script: replace `Code.gs` with the new file, **Save**, run **`setup`** once (adds the Requests tab, new columns and new Settings rows; deletes nothing).
+2. Run **`upgradeShortPins`**: everyone with a 4-digit PIN gets a 6-digit one (see the execution log, and the Staff tab). Tell each person their new PIN.
+3. Fill **`OwnerEmail`** in Settings, then run **`installTriggers`** once and approve the permissions (email, Drive for the backup, triggers).
+4. **Deploy → Manage deployments → ✏ → Version: New version → Deploy.**
+5. Push this repo; phones pick up the new app on next open (the version in Settings changes to 2.0.0). Each person enters their new PIN once.
 
 ---
 
@@ -31,11 +43,13 @@ vnsr.github.io/soni-motor                                 (bound to the Sheet)  
 
 | Tab | What to enter |
 |---|---|
-| **Settings** | `SchoolPhone` (10 digits). The practice app shows the WhatsApp button and number only once this is filled. Also fill `OfficeAddress`, `OfficeHours` and `ContactPerson`: the practice app shows them with the phone number and a *Get directions* button (Google Maps directions to the address, or to `MapLink` if you fill it). They live only in the Sheet, never in this public repo. `ReviewLink` is already filled with `g.page/r/CWKtBfMYEdoAEBM/review`. Check the `PIN`. The WhatsApp message texts can be edited here. |
+| **Settings** | `OwnerEmail`: the morning summary, Monday report and wrong-PIN alerts go here (several: separate with commas). `SchoolPhone` (10 digits). The practice app shows the WhatsApp button and number only once this is filled. Also fill `OfficeAddress`, `OfficeHours` and `ContactPerson`: the practice app shows them with the phone number and a *Get directions* button (Google Maps directions to the address, or to `MapLink` if you fill it). They live only in the Sheet, never in this public repo. `ReviewLink` is already filled with `g.page/r/CWKtBfMYEdoAEBM/review`. Check the `PIN`. The WhatsApp message texts can be edited here. |
 | **Staff** | One row per person: `Name` as it should appear in the app, `PIN` (4–8 digits, different for each person; run `setup` and it fills in random ones), `Active` Yes/No. Set **No** when someone leaves: their PIN stops working at once. |
 | **Packages** | One row per car: `PackageID` P1, P2 … · `Car` · `Transmission` Manual or Automatic · `Lessons` · `MinutesPerLesson` · `PriceINR` · `Active` Yes/No. |
 
 **Timetable:** `SlotStart` (06:30), `SlotEnd` (20:00) and `SlotMinutes` (30) in Settings set the day's slots. The cars are the car names in Packages; to list them yourself, fill `Cars` in Settings, comma-separated.
+
+**Daily jobs:** run **`installTriggers`** once. It sets up the 7:00 morning email, the Monday 8:00 report and a Sunday-night copy of the whole Sheet into the Drive folder *Soni Motor backups* (the newest 8 are kept). Run `dailyDigest` or `weeklyReport` by hand to see one straight away.
 
 Back in Apps Script, run **`checkSetup`** until the log says **Setup complete**. Until then the app shows an orange "Setup not finished" box on its home screen.
 
@@ -44,7 +58,7 @@ Back in Apps Script, run **`checkSetup`** until the log says **Setup complete**.
 1. **Deploy → New deployment → ⚙ Select type → Web app.**
 2. Description: `Soni Motor API`. Execute as: **Me**. Who has access: **Anyone**.
 3. **Deploy**, then copy the **Web app URL**. It ends in `/exec`.
-4. Check it: open the URL in a browser. You should see `{"ok":true,"app":"soni-motor","version":"1.5.1"}`.
+4. Check it: open the URL in a browser. You should see `{"ok":true,"app":"soni-motor","version":"2.0.0"}`.
 
 "Anyone" is needed because the phones aren't signed in to Google. The PIN is what protects the data.
 
@@ -79,8 +93,20 @@ Where people came from is read from `?src=` in the link. Use one per channel so 
 | `…/quiz/?src=gbp` | Google Business Profile posts |
 | `…/quiz/?src=card` | Review card and WhatsApp messages to students |
 | `…/quiz/?src=share` | Added automatically when someone shares their result |
+| `…/quiz/?src=student&r=…` | Added automatically when a student shares from their page (`r` = their referral code) |
+| `…/quiz/?src=topic-signs` etc. | Added automatically on the question pages for search engines |
 
 Limits built in: at most 40 events per phone and 3,000 per day, and one *open* per phone per day, so a spammer can't fill the Sheet.
+
+## Student page
+
+In a student's screen, **Make private link**, then **Send link on WhatsApp**. The student's page shows their lessons, next bookings, skills, fees, licence dates and documents, and lets them ask for a lesson time (morning, afternoon or evening on a date in the next 30 days, at most 3 waiting). Requests appear at the top of **Today → To do**; **Book** opens the timetable on that day with the student already chosen, and booking closes the request. **New link** makes the old link stop working (e.g. if it was forwarded). The link is not listed on search engines; it shows the first name only, no phone number.
+
+Students can share the practice app from their page. The link carries a short code; if someone sends the lessons form from it, the enquiry says *Referred by …* and the Report lists who brought in whom.
+
+## Licence dates
+
+In a student's screen, **Licence**: enter the date the learner licence was issued. The app works out that the driving test is possible 30 days later and that the learner licence runs out after 6 months (Central Motor Vehicles Rules), and warns on **Today** and in the morning email 30 days before it runs out. Enter the test date and result (*Passed* also sets the licence to Permanent), and tick the documents the school has received.
 
 ## 5. Test it yourself (10 min)
 
@@ -94,7 +120,10 @@ Limits built in: at most 40 events per phone and 3,000 per day, and one *open* p
 - [ ] Each step appears as a row in the Sheet, and in the Activity tab with your name
 - [ ] Open the quiz with `?src=flyer`, finish one test → two rows in QuizStats; the Report tab shows them
 - [ ] Send the lessons form with your own number → a new enquiry appears in the app; delete it afterwards
-- [ ] Delete your test rows in the Sheet (Enquiries, Students, Lessons, Payments, Skills)
+- [ ] Turn on flight mode, +1 lesson → grey bar *1 change saved on this phone*; turn flight mode off → the bar goes and the lesson is in the Sheet once
+- [ ] Make a student link, open it on another phone, ask for a lesson time → it shows on Today; **Book** it
+- [ ] Run `dailyDigest` → the morning email arrives at OwnerEmail
+- [ ] Delete your test rows in the Sheet (Enquiries, Students, Lessons, Payments, Skills, Requests)
 
 ## 6. Install on the phones (10 min each)
 
@@ -113,7 +142,9 @@ Then: each person enters **their own** PIN once. The app opens full screen from 
 
 ## Known limits
 
-- Saving needs internet. Without it the app shows the last loaded data and says so; nothing is queued.
-- The Apps Script ↔ app connection has been tested against a local stand-in for Google, not yet against your live Sheet. Step 5 is that first live test.
+- Without signal, the timetable and student links can't be changed (two phones could book the same slot). Everything else is kept on the phone and sent later.
+- If two phones change the same student's details without signal, the one sent last wins.
+- The Apps Script code is tested on every push against an in-memory stand-in for Google (`npm test`), not against your live Sheet. Step 5 is the live test.
+- Search engines need a few weeks to list the question pages. To speed it up, add `https://vnsr.github.io/soni-motor/sitemap.xml` in Google Search Console.
 - Each save takes 1–3 seconds because it goes through Google. A driving school's few hundred requests a day sit well inside the free Apps Script limits.
 - Keep the Sheet shared only with family accounts: it holds students' names and phone numbers.

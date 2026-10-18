@@ -1,0 +1,9 @@
+{
+  "name": "soni-motor",
+  "private": true,
+  "description": "Soni Motor Training School app. No dependencies; these scripts only run the checks.",
+  "scripts": {
+    "test": "node --test tests/*.test.js",
+    "topics": "node tools/build-topics.js"
+  }
+}

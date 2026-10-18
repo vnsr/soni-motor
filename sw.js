@@ -1,7 +1,7 @@
 // Soni Motor offline cache: keeps the app itself on the phone so it opens without signal.
 // Student data is never cached here; it comes from the Google Sheet (the app keeps only the last loaded copy).
-const CACHE = 'soni-motor-v1-5-1';
-const FILES = ['./', './index.html', './config.js', './manifest.webmanifest', './icon-180.png', './icon-192.png', './icon-512.png', './lib/qrcode.js'];
+const CACHE = 'soni-motor-v2-0-0';
+const FILES = ['./', './index.html', './config.js', './app/style.css', './app/i18n.js', './app/core.js', './app/screens.js', './app/demo.js', './manifest.webmanifest', './icon-180.png', './icon-192.png', './icon-512.png', './lib/qrcode.js'];
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(FILES)).then(() => self.skipWaiting()));
 });
@@ -11,7 +11,7 @@ self.addEventListener('activate', e => {
 self.addEventListener('fetch', e => {
   const url = new URL(e.request.url);
   if (e.request.method !== 'GET' || url.origin !== location.origin) return;   // Sheet API calls go straight to the network
-  if (url.pathname.includes('/quiz/')) return;                                  // the public quiz is not part of the app
+  if (url.pathname.includes('/quiz/') || url.pathname.includes('/student/')) return;   // the public pages are not part of the app
   const net = () => fetch(e.request).then(res => {
     if (res.ok) { const copy = res.clone(); caches.open(CACHE).then(c => c.put(e.request, copy)); }
     return res;
