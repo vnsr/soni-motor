@@ -56,6 +56,7 @@ button,input,select,textarea{font:inherit;color:inherit}
 .iconbtn{border:1px solid var(--line);background:var(--surface);border-radius:999px;width:36px;height:36px;display:grid;place-items:center;cursor:pointer}
 .iconbtn svg{width:18px;height:18px;stroke:var(--fg);fill:none;stroke-width:1.8}
 .demo{background:var(--warn-soft);color:var(--warn);font-size:13px;text-align:center;padding:6px 16px}
+.demo.queued{background:var(--sunk);color:var(--fg)}
 
 main{padding:16px 16px 28px;max-width:640px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
 h1{font-size:22px;margin:0;line-height:1.2}
@@ -270,7 +271,7 @@ const I18N = {
     lessons8: 'Lessons per week', lessonsK: 'Lessons', sources8: 'Where enquiries came from, last 8 weeks',
     offline: 'Could not save. Check the internet and try again.', required: 'Please fill in name and a 10-digit mobile number.',
     demo: 'Demo with made-up students and prices. Nothing is saved to the sheet.',
-    offlineBanner: 'No internet. Showing the last saved data; changes need internet.', locked: 'Too many wrong PINs. Try again in 15 minutes.',
+    offlineBanner: 'No internet. Showing the last saved data. Lessons, payments, enquiries and students you add are kept on this phone and sent later; the timetable needs internet.', locked: 'Too many wrong PINs. Try again in 15 minutes.',
     notSure: 'Not decided yet', lessonOn: 'Lesson date', done: 'done', joinedOn: 'Joined', last: 'Last lesson',
     weekOf: d => 'Week of ' + d, status: 'Status',
     progress: 'Progress card', skillsOf: (a, b) => `${a} of ${b} skills`, tapToTick: 'Tick a skill once the student can do it alone.',
@@ -290,6 +291,21 @@ const I18N = {
     srcName: { share: 'Shared by someone', flyer: 'Flyer QR code', gbp: 'Google profile', app: 'Installed app', direct: 'Direct link', card: 'Review card', office: 'Office poster' },
     bookedBy: 'Booked by', todayBookings: "Today's timetable", nextBooking: 'Next lesson', time: 'Time', tick: 'Done', printedOn: 'Printed',
     remindMsg: (n, d, tm, car) => `Hello ${n}, a reminder from Soni Motor Training School: your driving lesson is on ${d} at ${tm} (${car}). See you then!`,
+    queued: n => `${n} ${n === 1 ? 'change' : 'changes'} saved on this phone, sent when the internet is back`, savedLocal: 'No internet: saved on this phone and sent automatically later.',
+    needNet: 'This needs internet. Try again when there is signal.', dropped: (n, why) => `${n} saved ${n === 1 ? 'change was' : 'changes were'} refused by the sheet (${why})`,
+    licJourney: 'Licence', llDate: 'Learner licence issued', testDate: 'Driving test date', testResult: 'Test result',
+    res: { '': 'Not yet', Pass: 'Passed', Fail: 'Not passed' }, testFrom: d => `Driving test possible from ${d}`, llUntil: d => `Learner licence valid until ${d}`,
+    llExpired: 'The learner licence has expired', docsT: 'Documents received',
+    doc: { id: 'ID proof (Aadhaar)', address: 'Address proof', age: 'Age proof', photos: 'Passport photos', ll: 'Learner licence copy' },
+    llSoon: d => `Learner licence runs out ${d}`, testSoon: d => `Driving test ${d}`,
+    reqT: 'Asks for a lesson', want: { morning: 'morning', afternoon: 'afternoon', evening: 'evening' }, bookIt: 'Book', decline: 'Decline', bookFor: n => `Booking for ${n}: tap a free slot`,
+    tomorrowT: "Tomorrow's lessons", dueRemind: 'Remind',
+    studentPage: 'Student page', makeLink: 'Make private link', sendLink: 'Send link on WhatsApp', newLink: 'New link (the old one stops working)',
+    linkHint: 'The student sees progress, next lessons, fees and licence dates, and can ask for a lesson time.',
+    llTips: 'Send LL tips', llS: { have: 'Has LL', applied: 'LL applied', no: 'No LL yet' }, referredBy: 'Referred by',
+    incomeMonths: 'Money received per month', incomeCar: 'Money per car, last 6 months', carUse: 'Timetable booked this week',
+    perTrainer: 'Lessons per trainer, last 4 weeks', convSrc: 'Joined by source, last 8 weeks', duesT: 'Fees to collect', referrers: 'Brought in by students, last 90 days',
+    archivedN: n => `${n} older finished students are kept in the sheet only.`,
     skill: {
       controls: 'Seat, mirrors, seat belt, controls', moveoff: 'Starting, moving off, stopping', clutch: 'Clutch control and gear changes',
       steering: 'Steering and keeping in lane', turns: 'Left and right turns with indicator', signals: 'Signals, signs, right of way',
@@ -329,7 +345,7 @@ const I18N = {
     lessons8: 'અઠવાડિયા દીઠ લેસન', lessonsK: 'લેસન', sources8: 'પૂછપરછ ક્યાંથી આવી, છેલ્લા 8 અઠવાડિયા',
     offline: 'સાચવી ન શકાયું. ઇન્ટરનેટ તપાસીને ફરી પ્રયત્ન કરો.', required: 'નામ અને 10 અંકનો મોબાઇલ નંબર ભરો.',
     demo: 'ડેમો: વિદ્યાર્થીઓ અને કિંમતો કાલ્પનિક છે. શીટમાં કંઈ સચવાતું નથી.',
-    offlineBanner: 'ઇન્ટરનેટ નથી. છેલ્લે સાચવેલી માહિતી દેખાય છે; ફેરફાર માટે ઇન્ટરનેટ જોઈએ.', locked: 'ઘણી વાર ખોટો પિન નખાયો. 15 મિનિટ પછી ફરી પ્રયત્ન કરો.',
+    offlineBanner: 'ઇન્ટરનેટ નથી. છેલ્લે સાચવેલી માહિતી દેખાય છે. લેસન, ચુકવણી, પૂછપરછ અને વિદ્યાર્થી ઉમેરશો તો આ ફોનમાં સચવાશે અને પછી મોકલાશે; સમયપત્રક માટે ઇન્ટરનેટ જોઈએ.', locked: 'ઘણી વાર ખોટો પિન નખાયો. 15 મિનિટ પછી ફરી પ્રયત્ન કરો.',
     notSure: 'હજી નક્કી નથી', lessonOn: 'લેસનની તારીખ', done: 'થયા', joinedOn: 'જોડાયા', last: 'છેલ્લો લેસન',
     weekOf: d => d + 'નું અઠવાડિયું', status: 'સ્થિતિ',
     progress: 'પ્રગતિ કાર્ડ', skillsOf: (a, b) => `${b}માંથી ${a} શીખ્યા`, tapToTick: 'વિદ્યાર્થી જાતે કરી શકે ત્યારે જ ટિક કરો.',
@@ -349,6 +365,21 @@ const I18N = {
     srcName: { share: 'કોઈએ શેર કર્યું', flyer: 'ફ્લાયરનો QR કોડ', gbp: 'ગૂગલ પ્રોફાઇલ', app: 'ઇન્સ્ટૉલ કરેલી ઍપ', direct: 'સીધી લિંક', card: 'રિવ્યૂ કાર્ડ', office: 'ઑફિસનું પોસ્ટર' },
     bookedBy: 'બુક કરનાર', todayBookings: 'આજનું સમયપત્રક', nextBooking: 'આગળનો લેસન', time: 'સમય', tick: 'થયું', printedOn: 'છાપ્યું',
     remindMsg: (n, d, tm, car) => `નમસ્તે ${n}, સોની મોટર ટ્રેનિંગ સ્કૂલ તરફથી યાદ અપાવીએ છીએ: તમારો ડ્રાઇવિંગ લેસન ${d}ના રોજ ${tm} વાગ્યે છે (${car}). મળીએ!`,
+    queued: n => `${n} ફેરફાર આ ફોનમાં સચવાયા છે, ઇન્ટરનેટ આવે ત્યારે મોકલાશે`, savedLocal: 'ઇન્ટરનેટ નથી: આ ફોનમાં સચવાયું, પછી આપમેળે મોકલાશે.',
+    needNet: 'આ માટે ઇન્ટરનેટ જોઈએ. સિગ્નલ આવે ત્યારે ફરી પ્રયત્ન કરો.', dropped: (n, why) => `ફોનમાં સચવાયેલા ${n} ફેરફાર શીટે સ્વીકાર્યા નહીં (${why})`,
+    licJourney: 'લાઇસન્સ', llDate: 'લર્નિંગ લાઇસન્સ મળ્યું', testDate: 'ડ્રાઇવિંગ ટેસ્ટની તારીખ', testResult: 'ટેસ્ટનું પરિણામ',
+    res: { '': 'હજી નહીં', Pass: 'પાસ', Fail: 'પાસ નથી' }, testFrom: d => `ડ્રાઇવિંગ ટેસ્ટ ${d}થી આપી શકાય`, llUntil: d => `લર્નિંગ લાઇસન્સ ${d} સુધી માન્ય`,
+    llExpired: 'લર્નિંગ લાઇસન્સની મુદત પૂરી થઈ ગઈ છે', docsT: 'મળેલા દસ્તાવેજો',
+    doc: { id: 'ઓળખનો પુરાવો (આધાર)', address: 'સરનામાનો પુરાવો', age: 'ઉંમરનો પુરાવો', photos: 'પાસપોર્ટ ફોટા', ll: 'લર્નિંગ લાઇસન્સની નકલ' },
+    llSoon: d => `લર્નિંગ લાઇસન્સ ${d} પૂરું થાય છે`, testSoon: d => `ડ્રાઇવિંગ ટેસ્ટ ${d}`,
+    reqT: 'લેસનનો સમય માંગે છે', want: { morning: 'સવારે', afternoon: 'બપોરે', evening: 'સાંજે' }, bookIt: 'બુક કરો', decline: 'ના પાડો', bookFor: n => `${n} માટે બુકિંગ: ખાલી સ્લૉટ દબાવો`,
+    tomorrowT: 'આવતીકાલના લેસન', dueRemind: 'યાદ અપાવો',
+    studentPage: 'વિદ્યાર્થીનું પેજ', makeLink: 'ખાનગી લિંક બનાવો', sendLink: 'વૉટ્સઍપ પર લિંક મોકલો', newLink: 'નવી લિંક (જૂની બંધ થશે)',
+    linkHint: 'વિદ્યાર્થી પ્રગતિ, આગળના લેસન, ફી અને લાઇસન્સની તારીખો જુએ છે, અને લેસનનો સમય માંગી શકે છે.',
+    llTips: 'LL માટે ટિપ્સ મોકલો', llS: { have: 'LL છે', applied: 'LL માટે અરજી કરી', no: 'હજી LL નથી' }, referredBy: 'કોના કહેવાથી',
+    incomeMonths: 'મહિના દીઠ મળેલી રકમ', incomeCar: 'ગાડી દીઠ રકમ, છેલ્લા 6 મહિના', carUse: 'આ અઠવાડિયે બુક થયેલો સમય',
+    perTrainer: 'ટ્રેનર દીઠ લેસન, છેલ્લા 4 અઠવાડિયા', convSrc: 'ક્યાંથી આવ્યા અને જોડાયા, છેલ્લા 8 અઠવાડિયા', duesT: 'લેવાની બાકી ફી', referrers: 'વિદ્યાર્થીઓના કહેવાથી આવ્યા, છેલ્લા 90 દિવસ',
+    archivedN: n => `પૂરા થયેલા ${n} જૂના વિદ્યાર્થીઓ ફક્ત શીટમાં રાખ્યા છે.`,
     skill: {
       controls: 'સીટ, અરીસા, સીટબેલ્ટ અને કંટ્રોલ', moveoff: 'ગાડી ચાલુ કરવી, ઉપાડવી અને રોકવી', clutch: 'ક્લચ કંટ્રોલ અને ગિયર બદલવા',
       steering: 'સ્ટિયરિંગ અને લેનમાં રહેવું', turns: 'ઇન્ડિકેટર આપી ડાબે-જમણે વળવું', signals: 'સિગ્નલ, ટ્રાફિક ચિહ્નો અને રસ્તાનો હક',
@@ -407,38 +438,140 @@ function rel(s) {
   return st.lang === 'gu' ? `${n2(-n)} દિવસ પછી` : `in ${-n} days`;
 }
 const today = () => (st.db && st.db.today) || istToday();
+function addMonths(s, n) { const d = new Date(s + 'T00:00:00Z'); d.setUTCMonth(d.getUTCMonth() + n); return d.toISOString().slice(0, 10); }
+/* Learner licence rules (Central Motor Vehicles Rules): driving test 30 days after the LL at the earliest; the LL is valid 6 months */
+const LL_WAIT_DAYS = 30, LL_VALID_MONTHS = 6, DOCS = ['id', 'address', 'age', 'photos', 'll'];
+function llInfo(s) { return s.LLDate ? { from: addDays(s.LLDate, LL_WAIT_DAYS), until: addMonths(s.LLDate, LL_VALID_MONTHS) } : null; }
+function studentUrl(s) { const base = (st.db.settings || {}).StudentLink || new URL('student/', location.href.split(/[?#]/)[0]).href; return base + (base.includes('?') ? '&' : '?') + 't=' + s.Token; }
 
 /* ================= data access ================= */
+/* A random code for this phone. The Sheet remembers phones that logged in, so they keep working
+   even while a stranger is guessing PINs. */
+const DEVICE = (() => { let d = ls.get('dev', ''); if (!/^[a-z0-9]{16}$/.test(d)) { d = rnd(16, 'abcdefghijklmnopqrstuvwxyz0123456789'); ls.set('dev', d); } return d; })();
+function rnd(n, abc) { const a = new Uint8Array(n); crypto.getRandomValues(a); return Array.from(a, x => abc[x % abc.length]).join(''); }
+/* New rows get their ID on the phone, so a change that is sent twice (no signal, then sent again) is saved once */
+const NEW_ID = { addEnquiry: 'E', addStudent: 'S', logLesson: 'L', addPayment: 'P' };
+function newId(prefix) { return prefix + istToday().slice(2).replace(/-/g, '') + '-' + rnd(6, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'); }
+/* what can be saved without signal; the timetable and links need the Sheet's answer */
+const OFFLINE_OK = ['addEnquiry', 'updateEnquiry', 'addStudent', 'updateStudent', 'logLesson', 'undoLesson', 'addPayment', 'setSkill'];
+
 function call(action, payload) {
   payload = Object.assign({ LoggedBy: st.me }, payload || {});
+  if (NEW_ID[action] && !payload.NewID) payload.NewID = newId(NEW_ID[action]);
   $('#busy').hidden = false;
   const done = r => { $('#busy').hidden = true; return r; };
-  if (!IS_LIVE) return new Promise((res, rej) => setTimeout(() => { try { res(done(Mock.api(st.pin, action, payload))); } catch (e) { done(); e.server = true; rej(e); } }, 180));
+  if (!IS_LIVE) return new Promise((res, rej) => setTimeout(() => {
+    if (Mock.offline && action !== 'load') { done(); const e = new Error('net'); e.net = true; e.payload = payload; return rej(e); }
+    try { res(done(Mock.api(st.pin, action, payload))); } catch (e) { done(); e.server = true; rej(e); } }, 180));
   /* text/plain keeps this a simple request: no CORS preflight, which Apps Script cannot answer */
-  return fetch(API_URL, { method: 'POST', body: JSON.stringify({ pin: st.pin, action, payload }), headers: { 'Content-Type': 'text/plain;charset=utf-8' }, redirect: 'follow' })
+  return fetch(API_URL, { method: 'POST', body: JSON.stringify({ pin: st.pin, dev: DEVICE, action, payload }), headers: { 'Content-Type': 'text/plain;charset=utf-8' }, redirect: 'follow' })
     .then(r => r.json())
-    .then(r => { done(); if (!r.ok) { const e = new Error(r.error || 'error'); e.server = true; throw e; } if (r.db) { st.offline = false; ls.set('db', r.db); } return r; })
-    .catch(e => { done(); if (!e.server) e.net = true; throw e; });
+    .then(r => { done(); if (!r.ok) { const e = new Error(r.error || 'error'); e.server = true; throw e; } if (r.db) { st.offline = false; st.loadedAt = Date.now(); ls.set('db', r.db); } return r; })
+    .catch(e => { done(); if (!e.server) { e.net = true; e.payload = payload; } throw e; });
 }
+/* the Sheet's copy, with this phone's unsent changes laid on top */
 function adopt(db) {
   st.db = db;
+  if (db) queue().forEach(op => { try { reduce(st.db, op.action, op.payload, st.me); } catch (e) { } });
   if (db && db.me) {
     st.me = db.me; ls.set('me', db.me);
     if (!st.trainer || !(db.staff || []).includes(st.trainer)) { st.trainer = (db.staff || []).includes(db.me) ? db.me : ((db.staff || [])[0] || db.me); ls.set('trainer', st.trainer); }
   }
 }
+const queue = () => ls.get('queue', []);
 async function act(action, payload, okMsg) {
+  /* undoing a lesson that never left this phone just takes it out of the queue */
+  if (action === 'undoLesson' && queue().some(op => op.payload.NewID === payload.ID)) {
+    ls.set('queue', queue().filter(op => op.payload.NewID !== payload.ID)); adopt(ls.get('db', st.db)); render();
+    if (okMsg) toast(okMsg); return null;
+  }
   try {
     const r = await call(action, payload);
     adopt(r.db); render();
     if (okMsg) toast(typeof okMsg === 'function' ? okMsg(r.result) : okMsg);
+    if (queue().length) flush();
     return r.result;
   } catch (e) {
     const m = String(e && e.message || e);
     if (m === 'PIN') { ls.del('pin'); st.pin = ''; st.pinBad = true; st.db = null; render(); return null; }
     if (m === 'TAKEN') { toast(T().taken); try { const r = await call('load'); adopt(r.db); render(); } catch (x) { } throw e; }
-    toast(m === 'LOCKED' ? T().locked : T().offline); throw e;
+    if (e.net && OFFLINE_OK.includes(action) && st.db) {
+      ls.set('queue', [...queue(), { action, payload: e.payload, at: Date.now() }]);
+      const result = reduce(st.db, action, e.payload, st.me);
+      st.offline = true; render(); toast(T().savedLocal);
+      return result;
+    }
+    toast(m === 'LOCKED' ? T().locked : e.net && !OFFLINE_OK.includes(action) ? T().needNet : T().offline); throw e;
   }
+}
+/* sends the queued changes in the order they were made; stops at the first one that finds no signal */
+let flushing = false;
+async function flush() {
+  if (flushing || !queue().length || !st.pin) return;
+  flushing = true;
+  let refused = 0, why = '';
+  try {
+    while (queue().length) {
+      const op = queue()[0];
+      try {
+        const r = await call(op.action, op.payload);
+        ls.set('queue', queue().slice(1)); adopt(r.db);
+      } catch (e) {
+        if (e.net) break;
+        const m = String(e && e.message || e);
+        if (m === 'PIN' || m === 'LOCKED') break;
+        ls.set('queue', queue().slice(1)); refused++; why = m;
+      }
+    }
+  } finally { flushing = false; }
+  render();
+  if (refused) toast(T().dropped(refused, why));
+}
+window.addEventListener('online', () => flush());
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState !== 'visible' || !st.db || !st.pin) return;
+  if (queue().length) flush();
+  else if (IS_LIVE && Date.now() - (st.loadedAt || 0) > 5 * 60e3) call('load').then(r => { adopt(r.db); render(); }).catch(() => { });
+});
+setInterval(() => { if (queue().length && navigator.onLine !== false) flush(); }, 60e3);
+
+/* The same changes the Sheet makes, done on the phone's copy: used by the demo and for changes saved without signal */
+function reduce(db, action, p, me) {
+  const td = today(), now = new Date().toISOString(), find = (arr, id) => (arr || []).find(x => x.ID === id);
+  const by = { LoggedBy: me, Timestamp: now };
+  if (action === 'addEnquiry') { if (find(db.enquiries, p.NewID)) return find(db.enquiries, p.NewID); const r = Object.assign({ ID: p.NewID, Date: td, Name: p.Name, Phone: p.Phone, Source: p.Source, CarInterest: p.CarInterest || '', Note: p.Note || '', Status: 'New', FollowUp: p.FollowUp || '', LL: '', ReferredBy: '' }, by); db.enquiries.push(r); return r; }
+  if (action === 'updateEnquiry') { const e = find(db.enquiries, p.ID); if (e) ['Status', 'FollowUp', 'Note', 'CarInterest'].forEach(k => { if (p[k] !== undefined) e[k] = p[k]; }); return null; }
+  if (action === 'addStudent') {
+    if (find(db.students, p.NewID)) return find(db.students, p.NewID);
+    const r = Object.assign({ ID: p.NewID, JoinDate: td, Name: p.Name, Phone: p.Phone, PackageID: p.PackageID, Price: Number(p.Price) || 0, Instructor: p.Instructor, Licence: p.Licence || 'None', Status: 'Active', CompletedDate: '', ReviewAsked: '', ReviewDone: '', EnquiryID: p.EnquiryID || '', Notes: '', LLDate: p.LLDate || '', TestDate: '', TestResult: '', Docs: '', Token: '' }, by);
+    db.students.push(r);
+    const e = p.EnquiryID && find(db.enquiries, p.EnquiryID); if (e) e.Status = 'Joined';
+    if (Number(p.PayAmount) > 0) db.payments.push(Object.assign({ ID: p.NewID.replace(/^S/, 'P') + 'F', Date: td, StudentID: r.ID, AmountINR: Number(p.PayAmount), Mode: p.PayMode || 'Cash' }, by));
+    return r;
+  }
+  if (action === 'updateStudent') { const s = find(db.students, p.ID); if (s) ['Status', 'CompletedDate', 'ReviewAsked', 'ReviewDone', 'Licence', 'Notes', 'Instructor', 'Price', 'LLDate', 'TestDate', 'TestResult', 'Docs'].forEach(k => { if (p[k] !== undefined) s[k] = p[k]; }); return null; }
+  if (action === 'studentLink') { const s = find(db.students, p.ID); if (s && (!s.Token || p.Renew)) s.Token = rnd(32, 'abcdefghijklmnopqrstuvwxyz0123456789'); return s ? { ID: s.ID, Token: s.Token } : null; }
+  if (action === 'logLesson') {
+    if (find(db.lessons, p.NewID)) return find(db.lessons, p.NewID);
+    const r = Object.assign({ ID: p.NewID, Date: p.Date || td, StudentID: p.StudentID, LessonNo: db.lessons.filter(l => l.StudentID === p.StudentID).length + 1, Instructor: p.Instructor || '' }, by);
+    db.lessons.push(r); return r;
+  }
+  if (action === 'undoLesson') { db.lessons = db.lessons.filter(l => l.ID !== p.ID); return null; }
+  if (action === 'addPayment') { if (find(db.payments, p.NewID)) return find(db.payments, p.NewID); const r = Object.assign({ ID: p.NewID, Date: p.Date || td, StudentID: p.StudentID, AmountINR: Number(p.AmountINR), Mode: p.Mode || 'Cash' }, by); db.payments.push(r); return r; }
+  if (action === 'setSkill') { db.skills = (db.skills || []).filter(x => !(x.StudentID === p.StudentID && x.Skill === p.Skill)); if (p.On) db.skills.push(Object.assign({ StudentID: p.StudentID, Skill: p.Skill, Date: td }, by)); return null; }
+  if (action === 'setSlots') {
+    const days = p.Type === 'Blocked' ? Math.max(1, +p.Days || 1) : 1, dates = Array.from({ length: days }, (_, i) => addDays(p.Date, i));
+    const hit = b => b.Car === p.Car && dates.includes(b.Date) && p.Slots.includes(b.Slot);
+    if (db.bookings.some(hit) && !p.Replace) throw new Error('TAKEN');
+    db.bookings = db.bookings.filter(b => !hit(b));
+    dates.forEach(d => p.Slots.forEach(sl => db.bookings.push(Object.assign({ ID: newId('B'), Date: d, Car: p.Car, Slot: sl, Type: p.Type, StudentID: p.Type === 'Booked' ? p.StudentID : '', Note: p.Note || '' }, by))));
+    if (p.RequestID) db.requests = (db.requests || []).filter(r => r.ID !== p.RequestID);
+    return { count: dates.length * p.Slots.length };
+  }
+  if (action === 'clearSlots') { db.bookings = db.bookings.filter(b => !(b.Car === p.Car && b.Date === p.Date && p.Slots.includes(b.Slot))); return null; }
+  if (action === 'closeRequest') { db.requests = (db.requests || []).filter(r => r.ID !== p.ID); return null; }
+  if (action !== 'load') throw new Error('Unknown action: ' + action);
+  return null;
 }
 
 /* derived */
@@ -484,6 +617,7 @@ function render() {
       <button type="button" class="iconbtn" id="gear" aria-label="${t.settings}">${ico('gear')}</button>
     </header>
     ${IS_LIVE ? (st.offline ? `<div class="demo">${t.offlineBanner}</div>` : '') : `<div class="demo">${t.demo}</div>`}
+    ${queue().length ? `<div class="demo queued" role="status">${t.queued(queue().length)}</div>` : ''}
     <div class="scroller" id="scroller"><main id="main"></main></div>
     <nav class="tabs">${['home', 'students', 'timetable', 'enquiries', 'report'].map(k => `<button type="button" data-tab="${k}" ${st.tab === k ? 'aria-current="page"' : ''}>${ico(k)}${t[k]}</button>`).join('')}</nav>`;
   app.querySelectorAll('[data-lang]').forEach(b => b.onclick = () => { st.lang = b.dataset.lang; ls.set('lang', st.lang); render(); });
@@ -535,13 +669,22 @@ function renderHome(m) {
   const finished = S.filter(s => s.Status === 'Active' && s.tot && s.done >= s.tot);
   const review = S.filter(s => s.Status === 'Completed' && !s.ReviewAsked);
   const pay = S.filter(s => s.Status !== 'Dropped' && s.bal > 0 && s.tot && s.done >= Math.ceil(s.tot / 2));
+  const llSoon = S.filter(s => s.Status === 'Active' && s.TestResult !== 'Pass' && llInfo(s) && llInfo(s).until <= addDays(td, 30));
+  const tests = S.filter(s => s.TestDate && !s.TestResult && s.TestDate >= td && s.TestDate <= addDays(td, 7));
+  const reqs = (st.db.requests || []).map(r => Object.assign({ s: byId[r.StudentID] }, r)).filter(r => r.s);
   const todo = [
-    ...follow.map(e => `<div class="row"><div class="main"><div class="t">${esc(e.Name)}</div><div class="m">${t.followDue} · ${esc(t.src[e.Source] || e.Source)} · ${rel(e.Date)}</div></div>
+    ...reqs.map(r => `<div class="row"><div class="main"><div class="t">${esc(r.s.Name)}</div><div class="m">${t.reqT} · ${fd(r.Date, true)} · ${esc(t.want[r.Want] || r.Want)}${r.Note ? ' · ' + esc(r.Note) : ''}</div></div>
+      <div class="btns"><button class="btn primary" data-reqbook="${r.ID}">${t.bookIt}</button><button class="btn ghost" data-reqno="${r.ID}" aria-label="${t.decline}">✕</button></div></div>`),
+    ...tests.map(s => `<div class="row tap" data-stu="${s.ID}"><div class="main"><div class="t">${esc(s.Name)}</div><div class="m">${t.testSoon(fd(s.TestDate, true))}</div></div><span class="badge ok">RTO</span></div>`),
+    ...llSoon.map(s => `<div class="row tap" data-stu="${s.ID}"><div class="main"><div class="t">${esc(s.Name)}</div><div class="m">${llInfo(s).until < td ? t.llExpired : t.llSoon(fd(llInfo(s).until))}</div></div><span class="badge red">LL</span></div>`),
+    ...follow.map(e => `<div class="row"><div class="main"><div class="t">${esc(e.Name)}</div><div class="m">${t.followDue} · ${esc(t.src[e.Source] || e.Source)}${e.LL ? ' · ' + esc(t.llS[e.LL] || e.LL) : ''} · ${rel(e.Date)}</div></div>
       <div class="btns"><a class="btn wa" target="_blank" rel="noopener" href="${waLink(e.Phone, msg('Follow', e.Name))}">${t.whatsapp}</a><button class="btn ghost" data-enq="${e.ID}">›</button></div></div>`),
     ...finished.map(s => `<div class="row"><div class="main"><div class="t">${esc(s.Name)}</div><div class="m">${t.finished}</div></div><button class="btn" data-complete="${s.ID}">${t.markDone}</button></div>`),
     ...review.map(s => `<div class="row"><div class="main"><div class="t">${esc(s.Name)}</div><div class="m">${t.askReview}</div></div><a class="btn wa" target="_blank" rel="noopener" data-review="${s.ID}" href="${waLink(s.Phone, msg('Review', s.Name))}">${t.whatsapp}</a></div>`),
-    ...pay.map(s => `<div class="row tap" data-stu="${s.ID}"><div class="main"><div class="t">${esc(s.Name)}</div><div class="m">${t.payDue} · ${n2(s.done)}/${n2(s.tot)} ${t.lessons}</div></div><span class="badge due">${inr(s.bal)}</span></div>`)
+    ...pay.map(s => `<div class="row tap" data-stu="${s.ID}"><div class="main"><div class="t">${esc(s.Name)}</div><div class="m">${t.payDue} · ${n2(s.done)}/${n2(s.tot)} ${t.lessons}</div></div><span class="badge due">${inr(s.bal)}</span>
+      <a class="btn wa" target="_blank" rel="noopener" href="${waLink(s.Phone, msg('Due', s.Name, { amount: s.bal }))}">${t.dueRemind}</a></div>`)
   ];
+  const tmr = (st.db.bookings || []).filter(b => b.Date === addDays(td, 1) && b.Type === 'Booked').sort((a, b) => a.Slot.localeCompare(b.Slot));
   const issues = setupIssues();
   m.innerHTML = `
     <div><h1>${fd(td, true)}</h1><p class="sub">${t.you}: ${esc(st.me)}</p></div>
@@ -556,7 +699,9 @@ function renderHome(m) {
       return tb.length ? `<section><h2>${t.todayBookings} <span class="count">${n2(tb.length)}</span></h2><div class="card">${tb.map(b => { const s = stuById(b.StudentID); return `<div class="row tap" data-tt="${esc(b.Car)}"><span class="tm" style="font-weight:700;font-variant-numeric:tabular-nums;width:50px">${b.Slot}</span><div class="main"><div class="t">${esc(s ? s.Name : b.StudentID)}</div><div class="m">${esc(b.Car)}${b.Note ? ' · ' + esc(b.Note) : ''}</div></div></div>`; }).join('')}</div></section>` : ''; })()}
     <section><h2>${t.lessonsToday} <span class="count">${n2(todays.length)}</span></h2>
       <div class="card">${todays.length ? todays.map(l => { const s = byId[l.StudentID] || {}; return `<div class="row tap" data-stu="${l.StudentID}"><div class="main"><div class="t">${esc(s.Name || l.StudentID)}</div><div class="m">${t.lesson} ${n2(l.LessonNo)}${s.tot ? '/' + n2(s.tot) : ''} · ${esc(l.Instructor || '')}${l.LoggedBy && l.LoggedBy !== l.Instructor ? ' · ' + esc(l.LoggedBy) : ''}</div></div></div>`; }).join('') : `<div class="empty">${t.none}</div>`}</div></section>
-    <section><h2>${t.todo} <span class="count">${n2(todo.length)}</span></h2><div class="card">${todo.join('') || `<div class="empty">${t.none}</div>`}</div></section>`;
+    <section><h2>${t.todo} <span class="count">${n2(todo.length)}</span></h2><div class="card">${todo.join('') || `<div class="empty">${t.none}</div>`}</div></section>
+    ${tmr.length ? `<section><h2>${t.tomorrowT} <span class="count">${n2(tmr.length)}</span></h2><div class="card">${tmr.map(b => { const s = stuById(b.StudentID); return `<div class="row"><span class="tm" style="font-weight:700;font-variant-numeric:tabular-nums;width:50px">${b.Slot}</span><div class="main"><div class="t">${esc(s ? s.Name : b.StudentID)}</div><div class="m">${esc(b.Car)}</div></div>
+      ${s && s.Phone ? `<a class="btn wa" target="_blank" rel="noopener" href="${waLink(s.Phone, t.remindMsg(firstName(s.Name), fd(b.Date, true), b.Slot, b.Car))}">${t.remind}</a>` : ''}</div>`; }).join('')}</div></section>` : ''}`;
   m.querySelectorAll('[data-tt]').forEach(r => r.onclick = () => { st.tab = 'timetable'; st.ttCar = r.dataset.tt; st.ttDate = td; st.keepScroll = false; render(); });
   $('#aLesson').onclick = openLessonPicker; $('#aEnq').onclick = () => openEnquiryForm(); $('#aStu').onclick = () => openStudentForm(); $('#aPay').onclick = () => openPaymentForm();
   wireCommon(m);
@@ -576,6 +721,8 @@ function wireCommon(m) {
   m.querySelectorAll('[data-complete]').forEach(b => b.onclick = () => act('updateStudent', { ID: b.dataset.complete, Status: 'Completed', CompletedDate: today() }, T().saved));
   m.querySelectorAll('[data-review]').forEach(a => a.addEventListener('click', () => setTimeout(() => act('updateStudent', { ID: a.dataset.review, ReviewAsked: today() }), 300)));
   m.querySelectorAll('[data-plus]').forEach(b => b.onclick = e => { e.stopPropagation(); logLesson(b.dataset.plus); });
+  m.querySelectorAll('[data-reqbook]').forEach(b => b.onclick = () => { const r = (st.db.requests || []).find(x => x.ID === b.dataset.reqbook); if (!r) return; closeSheet(); st.ttReq = r; st.ttDate = r.Date; st.ttSel = null; st.tab = 'timetable'; st.keepScroll = false; render(); });
+  m.querySelectorAll('[data-reqno]').forEach(b => b.onclick = () => act('closeRequest', { ID: b.dataset.reqno }, T().saved).catch(() => { }));
 }
 
 /* ================= lessons ================= */
@@ -645,7 +792,6 @@ function openStudent(id) {
       <dt>${t.joinedOn}</dt><dd>${fd(s.JoinDate)}</dd>
       <dt>${t.status}</dt><dd>${esc(t.sst[s.Status] || s.Status)}</dd>
     </dl>
-    <div class="f"><label for="sLic">${t.licence}</label><select id="sLic">${LICS.map(k => `<option value="${k}" ${s.Licence === k ? 'selected' : ''}>${t.lic[k]}</option>`).join('')}</select></div>
     <div class="two">
       ${s.Status === 'Active' ? `<button class="btn primary big" id="dPlus">${t.addLesson}</button>` : ''}
       <button class="btn big" id="dPay">${t.addPay}</button>
@@ -658,20 +804,51 @@ function openStudent(id) {
       ${s.ReviewDone ? `<span class="badge ok">${t.reviewGot}</span>` : ''}
       ${quizOn() && s.Licence !== 'Permanent' ? `<a class="btn wa" target="_blank" rel="noopener" href="${waLink(s.Phone, msg('Quiz', s.Name))}">${t.sendQuiz}</a>` : ''}
     </div>
+    ${licSection(s)}
     <section><div class="skhead"><h2>${t.progress}</h2><span class="badge mute" id="skCount"></span></div>
       <p class="sub" style="margin:-4px 0 8px">${t.tapToTick}</p>
       <div class="card" id="skList" role="group" aria-label="${t.progress}"></div>
       <a class="btn wa big" id="skSend" target="_blank" rel="noopener" style="margin-top:10px">${t.sendCard}</a></section>
     <section><h2>${t.history} <span class="count">${n2(L.length)}</span></h2><div class="card">${L.map(l => `<div class="row"><div class="main"><div class="t">${t.lesson} ${n2(l.LessonNo)}</div><div class="m">${fd(l.Date, true)} · ${esc(l.Instructor || '')}</div></div></div>`).join('') || `<div class="empty">${t.none}</div>`}</div></section>
-    <section><h2>${t.payments} <span class="count">${n2(P.length)}</span></h2><div class="card">${P.map(p => `<div class="row"><div class="main"><div class="t">${inr(p.AmountINR)}</div><div class="m">${fd(p.Date)} · ${esc(t.mode[p.Mode] || p.Mode)}</div></div></div>`).join('') || `<div class="empty">${t.none}</div>`}</div></section>`, () => {
+    <section><h2>${t.payments} <span class="count">${n2(P.length)}</span></h2><div class="card">${P.map(p => `<div class="row"><div class="main"><div class="t">${inr(p.AmountINR)}</div><div class="m">${fd(p.Date)} · ${esc(t.mode[p.Mode] || p.Mode)}</div></div></div>`).join('') || `<div class="empty">${t.none}</div>`}</div></section>
+    <section><h2>${t.studentPage}</h2><p class="sub" style="margin:-4px 0 8px">${t.linkHint}</p>
+      ${s.Token ? `<div class="btns"><a class="btn wa big" style="flex:1" target="_blank" rel="noopener" href="${waLink(s.Phone, msg('Student', s.Name, { link: studentUrl(s) }))}">${t.sendLink}</a></div>
+        <button class="btn ghost" id="dRenew" style="margin-top:8px">${t.newLink}</button>` : `<button class="btn big" id="dLink">${t.makeLink}</button>`}</section>`, () => {
     const pl = $('#dPlus'); if (pl) pl.onclick = async () => { closeSheet(); await logLesson(id); };
     $('#dPay').onclick = () => { closeSheet(); openPaymentForm(id); };
     const dn = $('#dDone'); if (dn) dn.onclick = async () => { await act('updateStudent', { ID: id, Status: 'Completed', CompletedDate: today() }, t.saved); openStudent(id); };
     const rv = $('#dRev'); if (rv) rv.addEventListener('click', () => { if (!s.ReviewAsked) setTimeout(() => act('updateStudent', { ID: id, ReviewAsked: today() }), 300); });
     const gt = $('#dGot'); if (gt) gt.onclick = async () => { await act('updateStudent', { ID: id, ReviewDone: 'Yes', ReviewAsked: s.ReviewAsked || today() }, t.saved); openStudent(id); };
-    $('#sLic').onchange = e => act('updateStudent', { ID: id, Licence: e.target.value }, t.saved);
+    wireLic(s);
+    const mk = $('#dLink') || $('#dRenew'); if (mk) mk.onclick = async () => { try { await act('studentLink', { ID: id, Renew: mk.id === 'dRenew' }); openStudent(id); } catch (e) { } };
     const qr = $('#dQR'); if (qr) qr.onclick = () => openReviewQR(id);
     drawSkills(id);
+  });
+}
+
+/* ================= licence journey: LL date → wait 30 days → driving test, before the LL runs out ================= */
+function licSection(s) {
+  const t = T(), L = llInfo(s), td = today(), docs = new Set(String(s.Docs || '').split(',').filter(Boolean));
+  const hints = L ? [L.until < td && s.TestResult !== 'Pass' ? `<p class="warn">${t.llExpired}</p>` : '',
+    s.TestResult !== 'Pass' ? `<p class="sub">${t.testFrom(fd(L.from, true))} · ${t.llUntil(fd(L.until))}</p>` : ''].join('') : '';
+  return `<section><h2>${t.licJourney}</h2><div class="card" style="padding:14px;display:flex;flex-direction:column;gap:12px">
+    <div class="f"><label for="sLic">${t.licence}</label><select id="sLic">${LICS.map(k => `<option value="${k}" ${s.Licence === k ? 'selected' : ''}>${t.lic[k]}</option>`).join('')}</select></div>
+    <div class="two"><div class="f"><label for="sLL">${t.llDate}</label><input type="date" id="sLL" value="${esc(s.LLDate || '')}" max="${td}"></div>
+      <div class="f"><label for="sTD">${t.testDate}</label><input type="date" id="sTD" value="${esc(s.TestDate || '')}" ${L ? `min="${L.from}"` : ''}></div></div>
+    ${hints}
+    <div class="f"><span class="lbl">${t.testResult}</span><div class="chips" id="sTR">${['', 'Pass', 'Fail'].map(k => `<button type="button" class="chip" data-tr="${k}" aria-pressed="${(s.TestResult || '') === k}">${t.res[k]}</button>`).join('')}</div></div>
+    <div class="f"><span class="lbl">${t.docsT} <span class="count">${n2(docs.size)}/${n2(DOCS.length)}</span></span><div class="chips" id="sDocs">${DOCS.map(k => `<button type="button" class="chip" data-doc="${k}" aria-pressed="${docs.has(k)}">${docs.has(k) ? '✓ ' : ''}${t.doc[k]}</button>`).join('')}</div></div>
+  </div></section>`;
+}
+function wireLic(s) {
+  const id = s.ID, t = T(), save = async f => { try { await act('updateStudent', Object.assign({ ID: id }, f), t.saved); openStudent(id); } catch (e) { } };
+  $('#sLic').onchange = e => save({ Licence: e.target.value });
+  $('#sLL').onchange = e => save(Object.assign({ LLDate: e.target.value }, e.target.value && s.Licence === 'None' ? { Licence: 'Learner' } : {}));
+  $('#sTD').onchange = e => save({ TestDate: e.target.value });
+  $('#sTR').querySelectorAll('[data-tr]').forEach(b => b.onclick = () => save(Object.assign({ TestResult: b.dataset.tr }, b.dataset.tr === 'Pass' ? { Licence: 'Permanent' } : {})));
+  $('#sDocs').querySelectorAll('[data-doc]').forEach(b => b.onclick = () => {
+    const d = new Set(String(s.Docs || '').split(',').filter(Boolean)); d.has(b.dataset.doc) ? d.delete(b.dataset.doc) : d.add(b.dataset.doc);
+    save({ Docs: DOCS.filter(k => d.has(k)).join(',') });
   });
 }
 
@@ -800,7 +977,8 @@ function openEnquiry(id) {
   const isOpen = e.Status === 'New' || e.Status === 'Follow-up';
   sheet(e.Name, `
     <div class="btns"><a class="btn" href="tel:+91${esc(e.Phone)}">${t.call} ${esc(e.Phone)}</a><a class="btn wa" target="_blank" rel="noopener" href="${waLink(e.Phone, msg('Follow', e.Name))}">${t.whatsapp}</a>${quizOn() ? `<a class="btn wa" target="_blank" rel="noopener" href="${waLink(e.Phone, msg('Quiz', e.Name))}">${t.sendQuiz}</a>` : ''}</div>
-    <dl class="kv"><dt>${t.source}</dt><dd>${esc(t.src[e.Source] || e.Source)}</dd><dt>${t.car}</dt><dd>${esc(e.CarInterest || '–')}</dd><dt>${t.date}</dt><dd>${fd(e.Date)}</dd><dt>${t.status}</dt><dd>${esc(t.est[e.Status] || e.Status)}</dd>${e.FollowUp ? `<dt>${t.followUp}</dt><dd>${fd(e.FollowUp)}</dd>` : ''}${e.Note ? `<dt>${t.note}</dt><dd>${esc(e.Note)}</dd>` : ''}</dl>
+    <dl class="kv"><dt>${t.source}</dt><dd>${esc(t.src[e.Source] || e.Source)}</dd><dt>${t.car}</dt><dd>${esc(e.CarInterest || '–')}</dd><dt>${t.date}</dt><dd>${fd(e.Date)}</dd><dt>${t.status}</dt><dd>${esc(t.est[e.Status] || e.Status)}</dd>${e.FollowUp ? `<dt>${t.followUp}</dt><dd>${fd(e.FollowUp)}</dd>` : ''}${e.LL ? `<dt>${t.licence}</dt><dd>${esc(t.llS[e.LL] || e.LL)}</dd>` : ''}${e.ReferredBy && stuById(e.ReferredBy) ? `<dt>${t.referredBy}</dt><dd>${esc(stuById(e.ReferredBy).Name)}</dd>` : ''}${e.Note ? `<dt>${t.note}</dt><dd>${esc(e.Note)}</dd>` : ''}</dl>
+    ${isOpen && (e.LL === 'applied' || e.LL === 'no') ? `<a class="btn wa" target="_blank" rel="noopener" href="${waLink(e.Phone, msg('LL', e.Name))}">${t.llTips}</a>` : ''}
     ${isOpen ? `<button class="btn primary big" id="eJoin">${t.makeStudent}</button>
     <div class="two"><button class="btn big" id="eLater">${t.followDue} ${t.later}</button><button class="btn big" id="eLost">${t.lost}</button></div>` : ''}`, () => {
     if (!isOpen) return;
@@ -849,10 +1027,18 @@ function renderReport(m) {
   const weeks = Array.from({ length: 8 }, (_, i) => addDays(w0, -7 * (7 - i)));
   const lw = weeks.map(w => cnt(db.lessons, 'Date', w));
   const src = SOURCES.map(k => [k, db.enquiries.filter(e => e.Source === k && e.Date >= weeks[0]).length]).filter(x => x[1]).sort((a, b) => b[1] - a[1]);
-  const mx = Math.max(1, ...lw), W = 340, H = 150, bw = (W - 20) / 8;
-  let bars = `<line x1="0" x2="${W}" y1="${H - 22}" y2="${H - 22}" class="g"/>`;
-  lw.forEach((v, i) => { const h = v / mx * (H - 44), x = 10 + i * bw; bars += `<rect x="${x + 4}" y="${H - 22 - h}" width="${bw - 8}" height="${h}" rx="3" class="b ${i === 7 ? 'cur' : ''}"/><text x="${x + bw / 2}" y="${H - 26 - h}" text-anchor="middle">${n2(v)}</text><text x="${x + bw / 2}" y="${H - 6}" text-anchor="middle">${+weeks[i].slice(8)}/${+weeks[i].slice(5, 7)}</text>`; });
   const smx = Math.max(1, ...src.map(x => x[1]));
+  const M = moneyStats(), MON = st.lang === 'gu' ? MON_GU : MON_EN;
+  const dues = S.filter(s => s.Status !== 'Dropped' && s.bal > 0).sort((a, b) => b.bal - a.bal);
+  const trainers = {}; db.lessons.filter(l => l.Date >= from4).forEach(l => { const k = l.Instructor || '–'; trainers[k] = (trainers[k] || 0) + 1; });
+  const TR = Object.entries(trainers).sort((a, b) => b[1] - a[1]), trmx = Math.max(1, ...TR.map(x => x[1]));
+  const cars = carList(), nSlots = slotList().length * 7;
+  const use = cars.map(c => [c, (db.bookings || []).filter(b => b.Car === c && b.Type === 'Booked' && inW(b.Date, w0)).length]);
+  const byCar = Object.entries(M.byCar).filter(x => x[1]).sort((a, b) => b[1] - a[1]), cmx = Math.max(1, ...byCar.map(x => x[1]));
+  const conv = [...SOURCES, 'Practice'].map(k => { const E = db.enquiries.filter(e => e.Source === k && e.Date >= weeks[0]); return [k, E.length, E.filter(e => e.Status === 'Joined').length]; }).filter(x => x[1]).sort((a, b) => b[1] - a[1]);
+  const refs = {}; db.enquiries.filter(e => e.ReferredBy && e.Date >= addDays(td, -90)).forEach(e => { const r = refs[e.ReferredBy] || (refs[e.ReferredBy] = [0, 0]); r[0]++; if (e.Status === 'Joined') r[1]++; });
+  const REF = Object.entries(refs).map(([id, v]) => [stuById(id), ...v]).filter(x => x[0]).sort((a, b) => b[1] - a[1]);
+  const meter = (label, v, mx, right) => `<div class="row"><div class="main"><div class="t">${label}</div><div class="prog"><i style="width:${Math.min(100, v / mx * 100)}%"></i></div></div><b>${right}</b></div>`;
   m.innerHTML = `
     <div><h1>${t.thisWeek}</h1><p class="sub">${t.weekOf(fd(w0))}</p></div>
     <div class="stats">${K.map(([k, a, b, money]) => { const d = a - b; return `<div class="stat"><div class="k">${k}</div><div class="v">${money ? inr(a) : n2(a)}</div><div class="d ${d > 0 ? 'up' : d < 0 ? 'down' : ''}">${d > 0 ? '▲ ' : d < 0 ? '▼ ' : ''}${money ? inr(Math.abs(d)) : n2(Math.abs(d))} ${t.lastWeek}</div></div>`; }).join('')}</div>
@@ -861,13 +1047,41 @@ function renderReport(m) {
       <dt>${t.activeNow}</dt><dd>${n2(actN)}</dd>
       <dt>${t.outstanding}</dt><dd>${inr(owed)}</dd>
       <dt>${t.reviews}</dt><dd>${t.reviewsTxt(n2(asked), n2(got))}</dd></dl></div>
-    <section><h2>${t.lessons8}</h2><div class="card" style="padding:10px"><svg class="bars" viewBox="0 0 ${W} ${H}" role="img" aria-label="${t.lessons8}">${bars}</svg></div></section>
-    <section><h2>${t.sources8}</h2><div class="card">${src.map(([k, v]) => `<div class="row"><div class="main"><div class="t">${t.src[k]}</div><div class="prog"><i style="width:${v / smx * 100}%"></i></div></div><b>${n2(v)}</b></div>`).join('') || `<div class="empty">${t.none}</div>`}</div></section>
+    <section><h2>${t.incomeMonths}</h2><div class="card" style="padding:10px">${bars(M.months.map(x => x.inr), M.months.map(x => MON[+x.month.slice(5) - 1]), t.incomeMonths, v => v >= 1e5 ? (v / 1e5).toFixed(1) + 'L' : v >= 1e3 ? Math.round(v / 1e3) + 'k' : n2(v))}</div></section>
+    <section><h2>${t.duesT} <span class="count">${inr(owed)}</span></h2><div class="card">${dues.map(s => `<div class="row tap" data-stu="${s.ID}"><div class="main"><div class="t">${esc(s.Name)}</div><div class="m">${n2(s.done)}/${n2(s.tot || '–')} ${t.lessons} · ${esc(t.sst[s.Status] || s.Status)}</div></div><span class="badge due">${inr(s.bal)}</span>
+      <a class="btn wa" target="_blank" rel="noopener" href="${waLink(s.Phone, msg('Due', s.Name, { amount: s.bal }))}">${t.dueRemind}</a></div>`).join('') || `<div class="empty">${t.none}</div>`}</div></section>
+    <section><h2>${t.lessons8}</h2><div class="card" style="padding:10px">${bars(lw, weeks.map(w => `${+w.slice(8)}/${+w.slice(5, 7)}`), t.lessons8)}</div></section>
+    <section><h2>${t.perTrainer}</h2><div class="card">${TR.map(([k, v]) => meter(esc(k), v, trmx, n2(v))).join('') || `<div class="empty">${t.none}</div>`}</div></section>
+    ${cars.length ? `<section><h2>${t.carUse}</h2><div class="card">${use.map(([c, v]) => meter(esc(c), v, nSlots || 1, n2(Math.round(v / (nSlots || 1) * 100)) + '%')).join('')}</div></section>` : ''}
+    ${byCar.length ? `<section><h2>${t.incomeCar}</h2><div class="card">${byCar.map(([c, v]) => meter(esc(c), v, cmx, inr(v))).join('')}</div></section>` : ''}
+    <section><h2>${t.sources8}</h2><div class="card">${src.map(([k, v]) => meter(t.src[k], v, smx, n2(v))).join('') || `<div class="empty">${t.none}</div>`}</div></section>
+    ${conv.length ? `<section><h2>${t.convSrc}</h2><div class="card">${conv.map(([k, n, j]) => meter(t.src[k] || esc(k), j, n, `${n2(j)} / ${n2(n)}`)).join('')}</div></section>` : ''}
+    ${REF.length ? `<section><h2>${t.referrers}</h2><div class="card">${REF.map(([s, n, j]) => `<div class="row tap" data-stu="${s.ID}"><div class="main"><div class="t">${esc(s.Name)}</div></div><b>${n2(j)} / ${n2(n)}</b></div>`).join('')}</div></section>` : ''}
     ${(() => { const Q = st.db.quiz; if (!Q) return `<section><h2>${t.quizT}</h2><div class="card"><div class="empty">${t.quizNone}</div></div></section>`;
       const W = Q.weeks.slice().reverse().slice(0, 6), S = Object.entries(Q.sources || {}).sort((a, b) => b[1] - a[1]), smx = Math.max(1, ...S.map(x => x[1]));
       return `<section><h2>${t.quizT}</h2><div class="card qtab"><table><thead><tr>${t.quizCols.map(c => `<th>${c}</th>`).join('')}</tr></thead><tbody>
         ${W.map(w => `<tr><td>${fd(w.week)}</td><td>${n2(w.people)}</td><td>${n2(w.tests)}</td><td>${n2(w.ready)}</td><td>${n2(w.form || 0)}</td><td>${n2(w.share)}</td></tr>`).join('')}</tbody></table></div></section>
-        ${S.length ? `<section><h2>${t.quizSources}</h2><div class="card">${S.map(([k, v]) => `<div class="row"><div class="main"><div class="t">${esc(t.srcName[k] || k)}</div><div class="prog"><i style="width:${v / smx * 100}%"></i></div></div><b>${n2(v)}</b></div>`).join('')}</div></section>` : ''}`; })()}`;
+        ${S.length ? `<section><h2>${t.quizSources}</h2><div class="card">${S.map(([k, v]) => meter(esc(t.srcName[k] || k), v, smx, n2(v))).join('')}</div></section>` : ''}`; })()}
+    ${db.archived ? `<p class="ver">${t.archivedN(n2(db.archived))}</p>` : ''}`;
+  wireCommon(m);
+}
+/* bar chart: the last bar (this week / this month) is drawn darker */
+function bars(vals, labels, title, fmt) {
+  fmt = fmt || n2;
+  const n = vals.length, mx = Math.max(1, ...vals), W = 340, H = 150, bw = (W - 20) / n;
+  let g = `<line x1="0" x2="${W}" y1="${H - 22}" y2="${H - 22}" class="g"/>`;
+  vals.forEach((v, i) => { const h = v / mx * (H - 44), x = 10 + i * bw; g += `<rect x="${x + 3}" y="${H - 22 - h}" width="${bw - 6}" height="${h}" rx="3" class="b ${i === n - 1 ? 'cur' : ''}"/><text x="${x + bw / 2}" y="${H - 26 - h}" text-anchor="middle">${v ? fmt(v) : ''}</text><text x="${x + bw / 2}" y="${H - 6}" text-anchor="middle">${esc(labels[i])}</text>`; });
+  return `<svg class="bars" viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(title)}">${g}</svg>`;
+}
+/* money per month and per car: worked out by the Sheet from every payment; the demo works it out here */
+function moneyStats() {
+  if (st.db.money) return st.db.money;
+  const td = today(), y = +td.slice(0, 4), mo = +td.slice(5, 7), months = [];
+  for (let i = 11; i >= 0; i--) months.push({ month: new Date(Date.UTC(y, mo - 1 - i, 1)).toISOString().slice(0, 7), inr: 0 });
+  const S = Object.fromEntries(studentsX().map(s => [s.ID, s])), byCar = {}, from6 = addDays(td, -183);
+  st.db.payments.forEach(p => { const k = months.find(x => x.month === String(p.Date).slice(0, 7)); if (k) k.inr += Number(p.AmountINR || 0);
+    if (p.Date >= from6) { const c = (S[p.StudentID] && S[p.StudentID].pk && S[p.StudentID].pk.Car) || '–'; byCar[c] = (byCar[c] || 0) + Number(p.AmountINR || 0); } });
+  return { months, byCar };
 }
 
 /* ================= timetable ================= */
@@ -905,6 +1119,7 @@ function renderTimetable(m) {
       <label class="ttdate"><span><b>${fd(d, true)}</b><small>${rel(d)}</small></span><input type="date" id="ttD" value="${d}" aria-label="${t.date}"></label>
       <button class="iconbtn" id="ttNext" aria-label="›">›</button>
     </div>
+    ${st.ttReq && stuById(st.ttReq.StudentID) ? `<div class="selbar"><b>${esc(t.bookFor(stuById(st.ttReq.StudentID).Name))}</b><span class="sub">${fd(st.ttReq.Date, true)} · ${esc(t.want[st.ttReq.Want] || st.ttReq.Want)}</span><span class="sp"></span><button class="btn" id="reqX">${t.cancel}</button></div>` : ''}
     ${sel ? `<div class="selbar"><b>${t.selN(n2(sel.size))}</b><span class="sp"></span>
         <button class="btn" id="selBlock" ${sel.size ? '' : 'disabled'}>${t.blockSel}</button>
         <button class="btn" id="selFree" ${sel.size ? '' : 'disabled'}>${t.freeSel}</button>
@@ -926,6 +1141,7 @@ function renderTimetable(m) {
       }).join('')}
     </div>`;
   const go = n => { st.ttDate = addDays(d, n); st.keepScroll = false; render(); };
+  if ($('#reqX')) $('#reqX').onclick = () => { st.ttReq = null; render(); };
   $('#ttPrev').onclick = () => go(-1); $('#ttNext').onclick = () => go(1);
   $('#ttD').onchange = e => { if (e.target.value) { st.ttDate = e.target.value; st.keepScroll = false; render(); } };
   m.querySelectorAll('[data-cell]').forEach(b => b.onclick = () => {
@@ -953,11 +1169,15 @@ function openSlot(car, d, x) {
   if (!b) {
     const S = studentsX().filter(s => s.Status === 'Active').sort((a, c) => a.Name.localeCompare(c.Name));
     sheet(title, `<form id="fB" style="display:flex;flex-direction:column;gap:12px">
-        <div class="f"><label for="bS">${t.bookStudent}</label><select id="bS" required><option value="">${t.chooseStudent}</option>${S.map(s => `<option value="${s.ID}">${esc(s.Name)}${s.tot ? ' · ' + n2(s.done) + '/' + n2(s.tot) : ''}</option>`).join('')}</select></div>
+        <div class="f"><label for="bS">${t.bookStudent}</label><select id="bS" required><option value="">${t.chooseStudent}</option>${S.map(s => `<option value="${s.ID}" ${st.ttReq && st.ttReq.StudentID === s.ID ? 'selected' : ''}>${esc(s.Name)}${s.tot ? ' · ' + n2(s.done) + '/' + n2(s.tot) : ''}</option>`).join('')}</select></div>
         <div class="f"><label for="bN">${t.note}</label><input id="bN" maxlength="80" autocomplete="off"></div>
         <button class="btn primary big" type="submit">${t.bookStudent}</button></form>
       <button class="btn big" id="bBlk">${t.blockSlot}</button>`, () => {
-      $('#fB').onsubmit = async e => { e.preventDefault(); if (!$('#bS').value) return; try { await act('setSlots', { Car: car, Date: d, Slots: [x], Type: 'Booked', StudentID: $('#bS').value, Note: $('#bN').value.trim() }, t.saved); closeSheet(); } catch (z) { closeSheet(); } };
+      $('#fB').onsubmit = async e => {
+        e.preventDefault(); const sid = $('#bS').value; if (!sid) return;
+        const req = st.ttReq && st.ttReq.StudentID === sid ? st.ttReq : null;
+        try { await act('setSlots', Object.assign({ Car: car, Date: d, Slots: [x], Type: 'Booked', StudentID: sid, Note: $('#bN').value.trim() }, req ? { RequestID: req.ID } : {}), t.saved); if (req) { st.ttReq = null; render(); } closeSheet(); } catch (z) { closeSheet(); }
+      };
       $('#bBlk').onclick = () => openBlock(d, [car + '|' + x]);
     });
     return;
@@ -1038,11 +1258,21 @@ function openSettings() {
 }
 
 /* ================= whatsapp ================= */
-function msg(kind, name) {
+function msg(kind, name, x) {
   const s = st.db.settings || {};
-  const tpl = s[kind + 'Msg' + (st.lang === 'gu' ? 'GU' : 'EN')] || '';
-  return tpl.replace(/\{name\}/g, String(name || '').split(' ')[0]).replace(/\{link\}/g, s.ReviewLink || '').replace(/\{quiz\}/g, s.QuizLink || '');
+  const tpl = s[kind + 'Msg' + (st.lang === 'gu' ? 'GU' : 'EN')] || DEFAULT_MSG[kind + (st.lang === 'gu' ? 'GU' : 'EN')] || '';
+  return tpl.replace(/\{name\}/g, String(name || '').split(' ')[0]).replace(/\{link\}/g, s.ReviewLink || '').replace(/\{quiz\}/g, s.QuizLink || '')
+    .replace(/\{amount\}/g, x && x.amount ? inr(x.amount) : '').replace(/\{student\}/g, x && x.link || '');
 }
+/* used until the admin runs setup, which copies these into the Settings tab where they can be edited */
+const DEFAULT_MSG = {
+  DueEN: 'Hello {name}, this is Soni Motor Training School. {amount} of your fee is still due. You can pay at your next lesson or by UPI. Thank you!',
+  DueGU: 'નમસ્તે {name}, સોની મોટર ટ્રેનિંગ સ્કૂલ તરફથી. તમારી ફીના {amount} બાકી છે. આવતા લેસન વખતે અથવા UPIથી ચૂકવી શકો છો. આભાર!',
+  LLEN: 'Hello {name}, this is Soni Motor Training School. When is your learner licence test? Free practice: {quiz} If you start lessons once you have the LL, you will be ready for the driving test after the 30-day wait.',
+  LLGU: 'નમસ્તે {name}, સોની મોટર ટ્રેનિંગ સ્કૂલ તરફથી. લર્નિંગ લાઇસન્સની પરીક્ષા ક્યારે છે? તૈયારી માટે મફત પ્રેક્ટિસ: {quiz} LL મળે પછી 30 દિવસમાં ગાડી શીખવાનું શરૂ કરો તો પાકા લાઇસન્સની ટેસ્ટ સમયસર આપી શકશો.',
+  StudentEN: 'Hello {name}, see your driving progress, next lessons and licence dates here (this link is just for you): {student}',
+  StudentGU: 'નમસ્તે {name}, તમારી ડ્રાઇવિંગ પ્રગતિ, આગળના લેસન અને લાઇસન્સની તારીખો અહીં જુઓ (ફક્ત તમારા માટે): {student}'
+};
 function waLink(phone, text) { const p = String(phone || '').replace(/\D/g, '').slice(-10); return `https://wa.me/91${p}${text ? '?text=' + encodeURIComponent(text) : ''}`; }
 
 /* ================= sheet & toast ================= */
@@ -1089,7 +1319,7 @@ const Mock = (() => {
       { PackageID: 'P2', Car: 'Hyundai i20', Transmission: 'Manual', Lessons: 15, MinutesPerLesson: 30, PriceINR: 5500 },
       { PackageID: 'P3', Car: 'Maruti Baleno', Transmission: 'Automatic', Lessons: 12, MinutesPerLesson: 30, PriceINR: 6000 }
     ],
-    staff: ['Trainer', 'Office'], students: [], enquiries: [], lessons: [], payments: [], skills: [], bookings: []
+    staff: ['Trainer', 'Office'], students: [], enquiries: [], lessons: [], payments: [], skills: [], bookings: [], requests: []
   };
   const S = [
     ['Riya Patel', '1000000002', 'P1', 34, 15, 5000, 'Completed', '', 'Google'],
@@ -1117,7 +1347,14 @@ const Mock = (() => {
    ['Rohan Bhatt', '1000000012', 'Phone', 0, 'New', addDays(td, 1), ''], ['Sneha Solanki', '1000000013', 'Referral', 12, 'Lost', '', 'Hyundai i20'],
    ['Amit Rathod', '1000000014', 'WhatsApp', 6, 'Follow-up', addDays(td, 2), 'Maruti Swift'], ['Tanvi Pandya', '1000000015', 'Google', 20, 'Lost', '', '']]
     .forEach(([n, p, s, ago, stt, fu, car], i) => db.enquiries.push({ ID: 'EQ' + i, Date: d(ago), Name: n, Phone: p, Source: s, CarInterest: car, Note: '', Status: stt, FollowUp: fu }));
-  db.enquiries.push({ ID: 'EQ9', Date: d(0), Name: 'Nisha Parmar', Phone: '1000000016', Source: 'Practice', CarInterest: 'Automatic', Note: 'Evening / સાંજે · LL applied / LL માટે અરજી કરી · Link: flyer', Status: 'New', FollowUp: d(0), LoggedBy: 'Practice app form' });
+  db.enquiries.push({ ID: 'EQ9', Date: d(0), Name: 'Nidhi Parekh', Phone: '1000000016', Source: 'Practice', CarInterest: 'Automatic', Note: 'Evening / સાંજે · LL applied / LL માટે અરજી કરી · Referred by Riya Patel', Status: 'New', FollowUp: d(0), LoggedBy: 'Practice app form', LL: 'applied', ReferredBy: 'S1' });
+  db.enquiries.push({ ID: 'EQ10', Date: d(9), Name: 'Raj Soni', Phone: '1000000017', Source: 'Practice', CarInterest: 'Manual', Note: 'Referred by Riya Patel', Status: 'Joined', FollowUp: '', LL: 'have', ReferredBy: 'S1' });
+  /* licence journey and a slot request from a student's page */
+  Object.assign(db.students[2], { LLDate: d(40), TestDate: addDays(td, 3), Docs: 'id,address,photos,ll' });
+  Object.assign(db.students[3], { LLDate: d(160), Docs: 'id,photos' });
+  Object.assign(db.students[4], { LLDate: d(12), Docs: 'id' });
+  Object.assign(db.students[0], { LLDate: d(80), TestDate: d(30), TestResult: 'Pass', Docs: 'id,address,age,photos,ll', Token: 'demo0000riya0000patel000000000aa' });
+  db.requests.push({ ID: 'R1', Date: addDays(td, 1), StudentID: 'S5', Want: 'evening', Note: '', Status: 'Open' });
   /* demo timetable: a few bookings and a lunch block today and tomorrow */
   [[0, 'Maruti Swift', '07:00', 'S4'], [0, 'Maruti Swift', '07:30', 'S5'], [0, 'Maruti Swift', '17:00', 'S8'], [0, 'Maruti Baleno', '08:00', 'S3'], [0, 'Maruti Baleno', '18:30', 'S7'],
    [1, 'Maruti Swift', '06:30', 'S6'], [1, 'Hyundai i20', '09:00', 'S6']]
@@ -1130,33 +1367,12 @@ const Mock = (() => {
   function api(pin, action, p) {
     const me = PINS[String(pin)]; if (!me) throw new Error('PIN');
     p.LoggedBy = me;
-    let result = null;
-    const now = new Date().toISOString();
-    if (action === 'addEnquiry') { result = Object.assign({ ID: rid('E'), Date: td, Status: 'New' }, p); db.enquiries.push(result); }
-    if (action === 'updateEnquiry') Object.assign(db.enquiries.find(e => e.ID === p.ID), p);
-    if (action === 'addStudent') {
-      const id = rid('S'); result = { ID: id, JoinDate: td, Name: p.Name, Phone: p.Phone, PackageID: p.PackageID, Price: p.Price, Instructor: p.Instructor, Licence: p.Licence, Status: 'Active', CompletedDate: '', ReviewAsked: '', ReviewDone: '', EnquiryID: p.EnquiryID };
-      db.students.push(result);
-      if (p.EnquiryID) db.enquiries.find(e => e.ID === p.EnquiryID).Status = 'Joined';
-      if (p.PayAmount > 0) db.payments.push({ ID: rid('P'), Date: td, StudentID: id, AmountINR: p.PayAmount, Mode: p.PayMode, LoggedBy: p.LoggedBy });
-    }
-    if (action === 'updateStudent') { const { LoggedBy, ...f } = p; Object.assign(db.students.find(s => s.ID === p.ID), f); }
-    if (action === 'logLesson') { const n = db.lessons.filter(l => l.StudentID === p.StudentID).length + 1; result = { ID: rid('L'), Date: p.Date, StudentID: p.StudentID, LessonNo: n, Instructor: p.Instructor, LoggedBy: p.LoggedBy, Timestamp: now }; db.lessons.push(result); }
-    if (action === 'undoLesson') db.lessons = db.lessons.filter(l => l.ID !== p.ID);
-    if (action === 'setSkill') { db.skills = db.skills.filter(x => !(x.StudentID === p.StudentID && x.Skill === p.Skill)); if (p.On) db.skills.push({ StudentID: p.StudentID, Skill: p.Skill, Date: td, LoggedBy: p.LoggedBy }); }
-    if (action === 'addPayment') { result = { ID: rid('P'), Date: p.Date, StudentID: p.StudentID, AmountINR: p.AmountINR, Mode: p.Mode, LoggedBy: p.LoggedBy }; db.payments.push(result); }
-    if (action === 'setSlots') {
-      const days = p.Type === 'Blocked' ? Math.max(1, +p.Days || 1) : 1, dates = Array.from({ length: days }, (_, i) => addDays(p.Date, i));
-      const hit = b => b.Car === p.Car && dates.includes(b.Date) && p.Slots.includes(b.Slot);
-      if (db.bookings.some(hit) && !p.Replace) throw new Error('TAKEN');
-      db.bookings = db.bookings.filter(b => !hit(b));
-      dates.forEach(d => p.Slots.forEach(sl => db.bookings.push({ ID: rid('B'), Date: d, Car: p.Car, Slot: sl, Type: p.Type, StudentID: p.Type === 'Booked' ? p.StudentID : '', Note: p.Note || '', LoggedBy: me })));
-    }
-    if (action === 'clearSlots') db.bookings = db.bookings.filter(b => !(b.Car === p.Car && b.Date === p.Date && p.Slots.includes(b.Slot)));
+    const result = reduce(db, action, p, me);
     const out = copy(); out.me = me;
-    return { db: out, result };
+    return { db: out, result: result && JSON.parse(JSON.stringify(result)) };
   }
-  return { api };
+  /* ?demo&offline pretends there is no signal, to try saving on the phone */
+  return { api, offline: /[?&]offline\b/.test(location.search) };
 })();
 
 render();
