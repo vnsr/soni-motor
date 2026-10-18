@@ -8,6 +8,9 @@
 <meta property="og:title" content="લર્નિંગ લાઇસન્સ પ્રેક્ટિસ · Soni Motor">
 <meta property="og:description" content="197 પ્રશ્નો, પ્રેક્ટિસ અને 15 પ્રશ્નોની ટેસ્ટ, ગુજરાતી અને અંગ્રેજીમાં. Free learner's licence practice.">
 <meta property="og:image" content="https://vnsr.github.io/soni-motor/icon-512.png">
+<meta property="og:url" content="https://vnsr.github.io/soni-motor/quiz/">
+<link rel="canonical" href="https://vnsr.github.io/soni-motor/quiz/">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"Learner's licence practice · લર્નિંગ લાઇસન્સ પ્રેક્ટિસ","url":"https://vnsr.github.io/soni-motor/quiz/","applicationCategory":"EducationalApplication","operatingSystem":"Any","inLanguage":["gu","en"],"isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"INR"},"provider":{"@type":"Organization","name":"Soni Motor Training School","areaServed":"Vadodara"}}</script>
 <meta name="theme-color" content="#FFFFFF" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#181C22" media="(prefers-color-scheme: dark)">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -219,7 +222,7 @@ const TXT = {
     callUs: 'Phone / WhatsApp', share: 'Share this practice', shareResult: 'Share my result',
     shareMsg: `Free learner's licence practice in Gujarati and English from Soni Motor Training School, Vadodara: ${QUIZ_URL}?src=share`,
     shareResultMsg: (n, t) => `I scored ${n}/${t} in the free learner's licence practice test from Soni Motor Training School, Vadodara. Try it: ${QUIZ_URL}?src=share`,
-    copied: 'Link copied',
+    copied: 'Link copied', cardCta: 'Free practice in Gujarati and English', byTopic: 'All questions with answers, by topic',
     note: 'Practice questions written by the school from the rules of the road. The real RTO test uses its own questions and pass mark.',
     privacy: 'To improve this practice, the school counts test scores anonymously, without names or numbers. Your progress stays on this phone. Your name and number are sent only if you fill in the lessons form.' },
   gu: { brand: 'સોની મોટર', sub: 'ટ્રેનિંગ સ્કૂલ · કારેલીબાગ, વડોદરા', title: 'લર્નિંગ લાઇસન્સ પ્રેક્ટિસ',
@@ -250,7 +253,7 @@ const TXT = {
     callUs: 'ફોન / વૉટ્સઍપ', share: 'આ પ્રેક્ટિસ શેર કરો', shareResult: 'મારું પરિણામ શેર કરો',
     shareMsg: `સોની મોટર ટ્રેનિંગ સ્કૂલ, વડોદરા તરફથી ગુજરાતી અને અંગ્રેજીમાં મફત લર્નિંગ લાઇસન્સ પ્રેક્ટિસ: ${QUIZ_URL}?src=share`,
     shareResultMsg: (n, t) => `સોની મોટર ટ્રેનિંગ સ્કૂલ, વડોદરાની મફત લર્નિંગ લાઇસન્સ પ્રેક્ટિસ ટેસ્ટમાં મારા ${t}માંથી ${n} સાચા આવ્યા. તમે પણ અજમાવો: ${QUIZ_URL}?src=share`,
-    copied: 'લિંક કૉપી થઈ',
+    copied: 'લિંક કૉપી થઈ', cardCta: 'ગુજરાતી અને અંગ્રેજીમાં મફત પ્રેક્ટિસ', byTopic: 'બધા પ્રશ્નો જવાબ સાથે, વિષય પ્રમાણે',
     note: 'આ પ્રશ્નો સ્કૂલે ટ્રાફિક નિયમોમાંથી તૈયાર કર્યા છે. સાચી RTO ટેસ્ટમાં RTOના પોતાના પ્રશ્નો અને પાસિંગ માર્ક હોય છે.',
     privacy: 'આ પ્રેક્ટિસ સુધારવા સ્કૂલ ટેસ્ટના માર્ક નામ કે નંબર વગર ગણે છે. તમારી પ્રગતિ આ ફોનમાં જ રહે છે. તમે ક્લાસનું ફોર્મ ભરો તો જ તમારું નામ અને નંબર મોકલાય છે.' }
 };
@@ -267,6 +270,9 @@ let device = store.get('device', '');
 if (!device) { device = Array.from({ length: 12 }, () => 'abcdefghijklmnopqrstuvwxyz0123456789'[Math.floor(Math.random() * 36)]).join(''); store.set('device', device); }
 const SRC = (/[?&]src=([a-z0-9_-]{1,20})/i.exec(location.search) || [])[1] || '';
 if (SRC) store.set('src', SRC.toLowerCase());
+/* r = referral code of the student who shared the link; sent with the lessons form so the school knows who brought them */
+const REF = (/[?&]r=([a-z0-9]{8})\b/.exec(location.search) || [])[1] || '';
+if (REF) { store.set('ref', REF); if (!SRC) store.set('src', 'student'); }
 const source = () => store.get('src', '') || 'direct';
 
 /* ================= anonymous counts and school info ================= */
@@ -373,7 +379,31 @@ function schoolCard() {
 function wireCommon() {
   const b = $('bBook'); if (b) b.addEventListener('click', () => stat('book'));
   const jb = $('bJoin'); if (jb) jb.onclick = () => { S.view = 'join'; S.formErr = ''; render(); $('scroll').scrollTop = 0; };
-  document.querySelectorAll('[data-share]').forEach(x => x.onclick = () => shareText(x.dataset.share === 'result' ? T().shareResultMsg(x.dataset.n, x.dataset.t) : T().shareMsg));
+  document.querySelectorAll('[data-share]').forEach(x => x.onclick = () => x.dataset.share === 'result' ? shareResult(+x.dataset.n, +x.dataset.t) : shareText(T().shareMsg));
+}
+/* the result as a picture (score, verdict, link) for WhatsApp status and groups; plain text where pictures can't be shared */
+function resultCard(n, total) {
+  const t = T(), c = document.createElement('canvas'), W = 1080; c.width = W; c.height = W;
+  const g = c.getContext('2d'), pass = n >= PASS, font = (w, px) => `${w} ${px}px 'Hind Vadodara','Noto Sans Gujarati',system-ui,sans-serif`;
+  g.fillStyle = '#FFFFFF'; g.fillRect(0, 0, W, W);
+  g.fillStyle = '#C41E2A'; g.fillRect(0, 0, W, 18); g.fillRect(0, W - 18, W, 18);
+  g.strokeStyle = '#C41E2A'; g.lineWidth = 12; g.strokeRect(90, 110, 150, 150);
+  g.fillStyle = '#C41E2A'; g.font = "700 120px 'Barlow Condensed',Arial,sans-serif"; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('L', 165, 192);
+  g.textAlign = 'left'; g.fillStyle = '#15191F'; g.font = font(700, 54); g.fillText(t.brand, 280, 165);
+  g.fillStyle = '#59616D'; g.font = font(500, 34); g.fillText(t.title, 280, 225);
+  g.textAlign = 'center'; g.fillStyle = '#15191F'; g.font = "700 300px 'Barlow Condensed',Arial,sans-serif"; g.fillText(`${n}/${total}`, W / 2, 520);
+  g.fillStyle = pass ? '#1B7A47' : '#9A5800'; g.font = font(700, 60); g.fillText(pass ? t.pass : t.fail, W / 2, 720);
+  g.fillStyle = '#59616D'; g.font = font(500, 38); g.fillText(t.cardCta, W / 2, 840);
+  g.fillStyle = '#C41E2A'; g.font = font(700, 40); g.fillText(QUIZ_URL.replace(/^https:\/\//, ''), W / 2, 905);
+  return new Promise(res => c.toBlob(res, 'image/png'));
+}
+async function shareResult(n, total) {
+  const text = T().shareResultMsg(n, total);
+  try {
+    const blob = await resultCard(n, total), file = blob && new File([blob], 'll-practice-result.png', { type: 'image/png' });
+    if (file && navigator.canShare && navigator.canShare({ files: [file] })) { stat('share'); await navigator.share({ files: [file], text }); return; }
+  } catch (e) { if (e && e.name === 'AbortError') return; }
+  shareText(text);
 }
 async function shareText(text) {
   stat('share');
@@ -409,6 +439,7 @@ function renderHome() {
     </div></section>
     ${schoolCard()}
     <button class="btn ghost full" data-share="quiz">${t.share}</button>
+    <a class="btn ghost full" href="topics/">${t.byTopic}</a>
     <p class="note">${t.note}</p><p class="note">${t.privacy}</p>`;
   $('bTest').onclick = () => { newTest(); render(); $('scroll').scrollTop = 0; };
   $('bPractice').onclick = () => startPractice(null);
@@ -526,7 +557,7 @@ function renderJoin() {
     const btn = $('jSend'); btn.disabled = true; btn.textContent = t.sending;
     try {
       const res = await fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify({ action: 'publicEnquiry', payload: { Name: f.Name, Phone: ph, Gear: f.Gear, When: f.When, Licence: f.Licence, Website: $('jWeb').value, Device: device, Source: source(), Lang: S.lang } }) });
+        body: JSON.stringify({ action: 'publicEnquiry', payload: { Name: f.Name, Phone: ph, Gear: f.Gear, When: f.When, Licence: f.Licence, Website: $('jWeb').value, Device: device, Source: source(), Lang: S.lang, Ref: store.get('ref', '') } }) });
       const r = await res.json();
       if (!r.ok) { S.formErr = r.error === 'PHONE' ? t.errPhone : r.error === 'NAME' ? t.errName : r.error === 'LIMIT' ? t.errLimit : t.errNet; render(); return; }
       store.set('joined', { ref: r.ref, name: f.Name, d: Date.now() }); stat('form');
